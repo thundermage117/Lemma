@@ -7,3 +7,7 @@ build/
 .DS_Store
 .vscode/
 *.log
+
+# Book PDFs (add your own files here, they won't be committed)
+books/*.pdf
+books/*.PDF
