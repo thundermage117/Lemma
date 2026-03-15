@@ -56,8 +56,8 @@ export function TopicForm({ initialValues, books, onSubmit, onCancel }: TopicFor
       <Input label="Title" required value={form.title} onChange={(e) => set('title', e.target.value)} />
       <Input label="Subject" required placeholder="e.g. Real Analysis" value={form.subject} onChange={(e) => set('subject', e.target.value)} />
       <Textarea label="Summary" rows={2} placeholder="One-line description" value={form.summary ?? ''} onChange={(e) => set('summary', e.target.value)} />
-      <Textarea label="Notes" rows={4} placeholder="Detailed notes, definitions, theorems..." value={form.notes ?? ''} onChange={(e) => set('notes', e.target.value)} />
-      <Textarea label="Examples" rows={3} placeholder="Worked examples..." value={form.examples ?? ''} onChange={(e) => set('examples', e.target.value)} />
+      <Textarea label="Notes" rows={4} placeholder="Detailed notes, definitions, theorems... (Markdown + LaTeX supported, e.g. $\\epsilon$-$\\delta$)" value={form.notes ?? ''} onChange={(e) => set('notes', e.target.value)} />
+      <Textarea label="Examples" rows={3} placeholder="Worked examples... (Markdown + LaTeX supported)" value={form.examples ?? ''} onChange={(e) => set('examples', e.target.value)} />
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-slate-700">
           Confidence Level: <span className="text-indigo-600 font-semibold">{form.confidenceLevel}/10</span>

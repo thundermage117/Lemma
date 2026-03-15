@@ -81,7 +81,8 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input label="Title" required value={form.title} onChange={(e) => set('title', e.target.value)} />
-      <Textarea label="Problem Statement" required rows={3} value={form.problemStatement}
+      <Textarea label="Problem Statement" required rows={3} placeholder="Use Markdown + LaTeX, e.g. Prove $\\lim_{x\\to 0} \\frac{\\sin x}{x}=1$"
+        value={form.problemStatement}
         onChange={(e) => set('problemStatement', e.target.value)} />
       <div className="grid grid-cols-2 gap-3">
         <Select label="Source" value={form.sourceType} options={sourceOptions}
@@ -107,9 +108,9 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
       </div>
       <Input label="Tags" placeholder="e.g. continuity, limits, epsilon-delta"
         value={tagInput} onChange={(e) => handleTagChange(e.target.value)} />
-      <Textarea label="Attempt Notes" rows={2} value={form.attemptNotes ?? ''}
+      <Textarea label="Attempt Notes" rows={2} placeholder="Markdown + LaTeX supported" value={form.attemptNotes ?? ''}
         onChange={(e) => set('attemptNotes', e.target.value)} />
-      <Textarea label="Final Solution" rows={3} value={form.finalSolution ?? ''}
+      <Textarea label="Final Solution" rows={3} placeholder="Markdown + LaTeX supported" value={form.finalSolution ?? ''}
         onChange={(e) => set('finalSolution', e.target.value)} />
       <Textarea label="Mistakes Made" rows={2} value={form.mistakesMade ?? ''}
         onChange={(e) => set('mistakesMade', e.target.value)} />

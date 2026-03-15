@@ -5,6 +5,7 @@ import { TopicForm } from '../components/forms/TopicForm'
 import { Modal } from '../components/ui/Modal'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
+import { MarkdownContent } from '../components/ui/MarkdownContent'
 import type { Topic, CreateTopicInput, UpdateTopicInput } from '../types'
 
 const STATUSES = ['learning', 'revised', 'strong'] as const
@@ -114,13 +115,13 @@ export function Topics() {
                   {topic.notes && (
                     <div>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Notes</p>
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{topic.notes}</p>
+                      <MarkdownContent content={topic.notes} className="text-sm text-slate-700" />
                     </div>
                   )}
                   {topic.examples && (
                     <div>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Examples</p>
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{topic.examples}</p>
+                      <MarkdownContent content={topic.examples} className="text-sm text-slate-700" />
                     </div>
                   )}
                   <div className="flex gap-2 pt-2">

@@ -6,6 +6,7 @@ import { ProblemForm } from '../components/forms/ProblemForm'
 import { Modal } from '../components/ui/Modal'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
+import { MarkdownContent } from '../components/ui/MarkdownContent'
 import type { Problem, CreateProblemInput, UpdateProblemInput, ProblemStatus, Difficulty } from '../types'
 
 const STATUSES: ProblemStatus[] = ['not_started', 'attempted', 'solved', 'solved_with_help', 'revisit']
@@ -115,22 +116,26 @@ export function Problems() {
 
               {expanded === problem.id && (
                 <div className="px-5 pb-5 border-t border-slate-100 pt-4 space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Problem Statement</p>
+                    <MarkdownContent content={problem.problemStatement} className="text-sm text-slate-700" />
+                  </div>
                   {problem.attemptNotes && (
                     <div>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Attempt Notes</p>
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{problem.attemptNotes}</p>
+                      <MarkdownContent content={problem.attemptNotes} className="text-sm text-slate-700" />
                     </div>
                   )}
                   {problem.finalSolution && (
                     <div>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Solution</p>
-                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{problem.finalSolution}</p>
+                      <MarkdownContent content={problem.finalSolution} className="text-sm text-slate-700" />
                     </div>
                   )}
                   {problem.mistakesMade && (
                     <div>
                       <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Mistakes</p>
-                      <p className="text-sm text-amber-700 whitespace-pre-wrap">{problem.mistakesMade}</p>
+                      <MarkdownContent content={problem.mistakesMade} className="text-sm text-amber-700" />
                     </div>
                   )}
                   {problem.revisitDate && (
