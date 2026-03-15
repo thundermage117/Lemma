@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useTheme } from '../hooks/useTheme'
 
 const nav = [
   {
@@ -54,6 +55,10 @@ const nav = [
 ]
 
 export function Sidebar() {
+  const { theme, toggleTheme } = useTheme()
+
+  const isDark = theme === 'dark'
+
   return (
     <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
       {/* Logo */}
@@ -89,7 +94,24 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-5 py-4 border-t border-slate-200">
+      <div className="px-5 py-4 border-t border-slate-200 space-y-3">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="w-full inline-flex items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+        >
+          <span>{isDark ? 'Switch to light' : 'Switch to dark'}</span>
+          {isDark ? (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25M12 18.75V21M4.97 4.97l1.59 1.59M17.44 17.44l1.59 1.59M3 12h2.25M18.75 12H21M4.97 19.03l1.59-1.59M17.44 6.56l1.59-1.59M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+            </svg>
+          )}
+        </button>
         <p className="text-xs text-slate-400">Local · Single user</p>
       </div>
     </aside>
