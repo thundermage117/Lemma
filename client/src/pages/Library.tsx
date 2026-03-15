@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useBooks } from '../hooks/useBooks'
 import { BookForm } from '../components/forms/BookForm'
 import { Modal } from '../components/ui/Modal'
@@ -8,6 +9,7 @@ import type { Book, CreateBookInput, UpdateBookInput } from '../types'
 
 export function Library() {
   const { books, loading, error, createBook, updateBook, deleteBook } = useBooks()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [editing, setEditing] = useState<Book | null>(null)
 
@@ -86,6 +88,11 @@ export function Library() {
                     {!book.isActive && (
                       <Button size="sm" variant="ghost" onClick={() => handleSetActive(book)}>
                         Set Active
+                      </Button>
+                    )}
+                    {book.pdfFilename && (
+                      <Button size="sm" variant="secondary" onClick={() => navigate(`/reader/${book.id}`)}>
+                        Read
                       </Button>
                     )}
                     <Button size="sm" variant="secondary" onClick={() => setEditing(book)}>Edit</Button>

@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
 
 import booksRouter from './routes/books'
 import topicsRouter from './routes/topics'
@@ -14,6 +15,7 @@ const PORT = process.env.PORT ?? 3001
 
 app.use(cors())
 app.use(express.json())
+app.use('/books', express.static(path.join(__dirname, '../../books')))
 
 app.use('/api/books', booksRouter)
 app.use('/api/topics', topicsRouter)
