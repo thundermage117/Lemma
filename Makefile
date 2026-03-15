@@ -21,10 +21,9 @@ migrate:
 seed:
 	cd server && npm run seed
 
-# Drop the database, re-migrate, and re-seed
+# Reset the database, re-migrate, and re-seed
 reset:
-	rm -f server/prisma/dev.db
-	cd server && npx prisma migrate dev --name init
+	cd server && npx prisma migrate reset --force --skip-seed
 	cd server && npm run seed
 
 # Build server (tsc) and client (vite build)

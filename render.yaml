@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: lemma
+    runtime: node
+    plan: free
+    buildCommand: |
+      npm install --prefix server
+      npm install --prefix client
+      npm run build --prefix server
+      npm run build --prefix client
+    startCommand: |
+      cd server
+      npx prisma migrate deploy --schema prisma/schema.prisma
+      node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false

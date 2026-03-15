@@ -17,7 +17,7 @@ A personal math study OS. Track reading progress, organise topic notes, log prac
 
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript
-- **Database**: SQLite (via Prisma ORM)
+- **Database**: PostgreSQL (via Prisma ORM)
 - **Architecture**: local-first, single user, no authentication
 
 ## 🗂 Project Structure
@@ -44,6 +44,7 @@ lemma/
 
 - Node.js ≥ 18
 - npm
+- PostgreSQL (local install or hosted)
 
 ## 🚀 Getting Started
 
@@ -51,6 +52,7 @@ lemma/
 git clone <repo-url>
 cd lemma
 make install
+cp server/.env.example server/.env
 make migrate
 make seed
 ```
@@ -80,7 +82,7 @@ Open `http://localhost:5173`.
 make reset
 ```
 
-Deletes the SQLite database, re-runs migrations, and re-seeds.
+Resets the configured PostgreSQL database, re-runs migrations, and re-seeds.
 
 ### Production build
 
