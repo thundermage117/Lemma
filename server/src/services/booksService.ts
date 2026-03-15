@@ -1,5 +1,4 @@
 import { prisma } from '../lib/prisma'
-import type { BookStatus } from '@prisma/client'
 
 export interface BookInput {
   title: string
@@ -10,7 +9,7 @@ export interface BookInput {
   totalPages?: number
   currentPage?: number
   currentChapter?: string
-  status?: BookStatus
+  status?: string
   isActive?: boolean
 }
 

@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
 import * as questionsService from '../services/questionsService'
-import type { QuestionStatus } from '@prisma/client'
-
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const status = req.query.status as QuestionStatus | undefined
+    const status = req.query.status as string | undefined
     const questions = await questionsService.getAll(status)
     res.json(questions)
   } catch {

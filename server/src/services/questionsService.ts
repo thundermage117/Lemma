@@ -1,15 +1,14 @@
 import { prisma } from '../lib/prisma'
-import type { QuestionStatus } from '@prisma/client'
 
 export interface QuestionInput {
   text: string
   linkedBookId?: number | null
   linkedTopicId?: number | null
   pageNumber?: number | null
-  status?: QuestionStatus
+  status?: string
 }
 
-export const getAll = async (status?: QuestionStatus) => {
+export const getAll = async (status?: string) => {
   return prisma.question.findMany({
     where: status ? { status } : {},
     include: {

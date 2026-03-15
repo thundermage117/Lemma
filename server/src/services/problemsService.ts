@@ -1,17 +1,17 @@
 import { prisma } from '../lib/prisma'
-import type { Problem, SourceType, Difficulty, ProblemStatus } from '@prisma/client'
+import type { Problem } from '@prisma/client'
 
 export interface ProblemInput {
   title: string
-  sourceType?: SourceType
+  sourceType?: string
   linkedBookId?: number | null
   topicId?: number | null
   chapterOrSection?: string
   pageNumber?: number | null
   problemStatement: string
-  difficulty?: Difficulty
+  difficulty?: string
   tags?: string[]
-  status?: ProblemStatus
+  status?: string
   attemptNotes?: string
   finalSolution?: string
   mistakesMade?: string
@@ -39,8 +39,8 @@ function toDbInput(data: Partial<ProblemInput>) {
 }
 
 export const getAll = async (filters?: {
-  status?: ProblemStatus
-  difficulty?: Difficulty
+  status?: string
+  difficulty?: string
   topicId?: number
   bookId?: number
 }) => {

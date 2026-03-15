@@ -1,5 +1,4 @@
 import { prisma } from '../lib/prisma'
-import type { TopicStatus } from '@prisma/client'
 
 export interface TopicInput {
   title: string
@@ -11,10 +10,10 @@ export interface TopicInput {
   linkedBookId?: number | null
   pageStart?: number | null
   pageEnd?: number | null
-  status?: TopicStatus
+  status?: string
 }
 
-export const getAll = async (bookId?: number, status?: TopicStatus) => {
+export const getAll = async (bookId?: number, status?: string) => {
   return prisma.topic.findMany({
     where: {
       ...(bookId ? { linkedBookId: bookId } : {}),

@@ -1,11 +1,9 @@
 import { Request, Response } from 'express'
 import * as topicsService from '../services/topicsService'
-import type { TopicStatus } from '@prisma/client'
-
 export const getAll = async (req: Request, res: Response) => {
   try {
     const bookId = req.query.bookId ? Number(req.query.bookId) : undefined
-    const status = req.query.status as TopicStatus | undefined
+    const status = req.query.status as string | undefined
     const topics = await topicsService.getAll(bookId, status)
     res.json(topics)
   } catch {

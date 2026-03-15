@@ -7,59 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum BookStatus {
-  not_started
-  reading
-  paused
-  finished
-}
-
-enum TopicStatus {
-  learning
-  revised
-  strong
-}
-
-enum SourceType {
-  textbook
-  self
-  other
-}
-
-enum Difficulty {
-  easy
-  medium
-  hard
-}
-
-enum ProblemStatus {
-  not_started
-  attempted
-  solved
-  solved_with_help
-  revisit
-}
-
-enum QuestionStatus {
-  open
-  understood
-  revisit
-}
-
 model Book {
-  id             Int        @id @default(autoincrement())
+  id             Int      @id @default(autoincrement())
   title          String
   author         String
   subject        String
   description    String?
   pdfFilename    String?
   totalPages     Int?
-  currentPage    Int        @default(0)
+  currentPage    Int      @default(0)
   currentChapter String?
-  status         BookStatus @default(not_started)
-  isActive       Boolean    @default(false)
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
+  status         String   @default("not_started")
+  isActive       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   topics         Topic[]
   problems       Problem[]
@@ -68,19 +29,19 @@ model Book {
 }
 
 model Topic {
-  id              Int         @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   title           String
   subject         String
   summary         String?
   notes           String?
   examples        String?
-  confidenceLevel Int         @default(5)
+  confidenceLevel Int      @default(5)
   linkedBookId    Int?
   pageStart       Int?
   pageEnd         Int?
-  status          TopicStatus @default(learning)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  status          String   @default("learning")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   book           Book?          @relation(fields: [linkedBookId], references: [id])
   problems       Problem[]
@@ -89,23 +50,23 @@ model Topic {
 }
 
 model Problem {
-  id               Int           @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   title            String
-  sourceType       SourceType    @default(textbook)
+  sourceType       String    @default("textbook")
   linkedBookId     Int?
   topicId          Int?
   chapterOrSection String?
   pageNumber       Int?
   problemStatement String
-  difficulty       Difficulty    @default(medium)
+  difficulty       String    @default("medium")
   tags             String?
-  status           ProblemStatus @default(not_started)
+  status           String    @default("not_started")
   attemptNotes     String?
   finalSolution    String?
   mistakesMade     String?
   revisitDate      DateTime?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   book  Book?  @relation(fields: [linkedBookId], references: [id])
   topic Topic? @relation(fields: [topicId], references: [id])
@@ -129,14 +90,14 @@ model JournalEntry {
 }
 
 model Question {
-  id            Int            @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   text          String
   linkedBookId  Int?
   linkedTopicId Int?
   pageNumber    Int?
-  status        QuestionStatus @default(open)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  status        String   @default("open")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   book  Book?  @relation(fields: [linkedBookId], references: [id])
   topic Topic? @relation(fields: [linkedTopicId], references: [id])

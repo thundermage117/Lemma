@@ -1,12 +1,10 @@
 import { Request, Response } from 'express'
 import * as problemsService from '../services/problemsService'
-import type { ProblemStatus, Difficulty } from '@prisma/client'
-
 export const getAll = async (req: Request, res: Response) => {
   try {
     const problems = await problemsService.getAll({
-      status: req.query.status as ProblemStatus | undefined,
-      difficulty: req.query.difficulty as Difficulty | undefined,
+      status: req.query.status as string | undefined,
+      difficulty: req.query.difficulty as string | undefined,
       topicId: req.query.topicId ? Number(req.query.topicId) : undefined,
       bookId: req.query.bookId ? Number(req.query.bookId) : undefined,
     })
