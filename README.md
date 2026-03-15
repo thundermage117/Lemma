@@ -12,6 +12,8 @@ A personal math study OS. Track reading progress, organise topic notes, log prac
 - **Open Questions** — quick-capture for things you don't understand yet, resolvable from the dashboard
 - **Study Streak** — increments each day you write a journal entry; longest streak tracked
 - **Dark mode** — toggleable from the sidebar, persisted in localStorage
+- **Book Reader** — in-browser PDF viewer linked to your active book and current page
+- **Markdown + LaTeX** — topic notes and problem solutions render rich text and math notation
 
 ## 🛠 Tech Stack
 
@@ -127,8 +129,8 @@ Compiles the server TypeScript and builds the client bundle to `client/dist/`.
 - [ ] Reading progress chart over time
 - [ ] Weekly study stats (pages read, problems solved, time logged)
 - [ ] JSON export/import for backup
-- [ ] Markdown rendering in notes and solutions
-- [ ] In-browser PDF viewer (linked to current page)
+- [x] Markdown rendering in notes and solutions
+- [x] In-browser PDF viewer (linked to current page)
 
 ### v1.2 — Ideas
 
