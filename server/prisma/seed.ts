@@ -12,272 +12,321 @@ async function main() {
   await prisma.topic.deleteMany()
   await prisma.book.deleteMany()
 
-  // Books
-  const rudin = await prisma.book.create({
+  // ── Books ────────────────────────────────────────────────────────────────
+  const analysis = await prisma.book.create({
     data: {
-      title: 'Principles of Mathematical Analysis',
-      author: 'Walter Rudin',
+      title: 'Understanding Analysis',
+      author: 'Stephen Abbott',
       subject: 'Real Analysis',
-      description: 'The classic baby Rudin — rigorous intro to real analysis.',
-      totalPages: 342,
-      currentPage: 87,
-      currentChapter: 'Chapter 4: Continuity',
+      description: 'Accessible intro to real analysis — builds intuition alongside rigour.',
+      pdfFilename: 'UnderstandingAnalysis.pdf',
+      totalPages: 312,
+      currentPage: 42,
+      currentChapter: 'Chapter 2: Sequences and Series',
       status: 'reading',
       isActive: true,
     },
   })
 
-  const axler = await prisma.book.create({
+  const proof = await prisma.book.create({
     data: {
-      title: 'Linear Algebra Done Right',
-      author: 'Sheldon Axler',
-      subject: 'Linear Algebra',
-      description: 'A clean, determinant-free approach to linear algebra.',
-      totalPages: 340,
+      title: 'Book of Proof',
+      author: 'Richard Hammack',
+      subject: 'Proof Writing',
+      description: 'Introduction to mathematical proof techniques — logic, sets, induction.',
+      pdfFilename: 'BookOfProof.pdf',
+      totalPages: 314,
+      currentPage: 28,
+      currentChapter: 'Chapter 2: Logic',
+      status: 'reading',
+      isActive: false,
+    },
+  })
+
+  await prisma.book.create({
+    data: {
+      title: 'Abstract Algebra',
+      author: 'David S. Dummit & Richard M. Foote',
+      subject: 'Abstract Algebra',
+      description: 'Comprehensive treatment of groups, rings, and fields.',
+      pdfFilename: 'AbstractAlgebra.pdf',
+      totalPages: 932,
       currentPage: 0,
       status: 'not_started',
       isActive: false,
     },
   })
 
-  // Topics
-  const metricSpaces = await prisma.topic.create({
+  // ── Topics ───────────────────────────────────────────────────────────────
+  const realNumbers = await prisma.topic.create({
     data: {
-      title: 'Metric Spaces',
+      title: 'The Real Numbers',
       subject: 'Real Analysis',
-      summary: 'Generalisation of the real line — distance functions and open sets.',
+      summary: 'Axiom of Completeness, Archimedean Property, and density of ℚ in ℝ.',
       notes:
-        'A metric space is a set X together with a function d: X×X → ℝ satisfying positivity, symmetry, and the triangle inequality. Key examples: ℝⁿ with Euclidean distance, C[a,b] with sup-norm distance.',
+        'The Axiom of Completeness: every non-empty set of real numbers that is bounded above has a least upper bound (supremum) in ℝ. This is what distinguishes ℝ from ℚ.\n\nArchimedean Property: for any x ∈ ℝ, there exists n ∈ ℕ with n > x.\n\nDensity of ℚ: between any two real numbers there is a rational number.',
       examples:
-        'Example 1: ℝ with d(x,y)=|x−y|. Example 2: Discrete metric. Example 3: Sequence spaces.',
+        'sup{1 − 1/n : n ∈ ℕ} = 1 (in ℝ, not in the set itself). The set {x ∈ ℚ : x² < 2} is bounded above in ℚ but has no supremum in ℚ.',
       confidenceLevel: 7,
-      linkedBookId: rudin.id,
-      pageStart: 30,
-      pageEnd: 52,
+      linkedBookId: analysis.id,
+      pageStart: 1,
+      pageEnd: 20,
       status: 'revised',
-    },
-  })
-
-  const continuity = await prisma.topic.create({
-    data: {
-      title: 'Continuity',
-      subject: 'Real Analysis',
-      summary: 'Epsilon-delta definition and topological characterisation.',
-      notes:
-        'f: X→Y is continuous at p if for every ε>0 there exists δ>0 such that d(x,p)<δ implies d(f(x),f(p))<ε. Equivalent characterisation: f is continuous iff the preimage of every open set is open.',
-      confidenceLevel: 5,
-      linkedBookId: rudin.id,
-      pageStart: 83,
-      pageEnd: 101,
-      status: 'learning',
     },
   })
 
   const sequences = await prisma.topic.create({
     data: {
-      title: 'Sequences and Series',
+      title: 'Sequences and Limits',
       subject: 'Real Analysis',
-      summary: 'Convergence, Cauchy sequences, completeness.',
+      summary: 'Epsilon-N definition of convergence, limit laws, squeeze theorem.',
       notes:
-        'A sequence {pₙ} converges to p if for every ε>0 there exists N such that n≥N implies d(pₙ,p)<ε. Cauchy sequences: for every ε>0 there exists N such that n,m≥N implies d(pₙ,pₘ)<ε.',
+        'A sequence (aₙ) converges to L if for every ε > 0 there exists N ∈ ℕ such that n ≥ N implies |aₙ − L| < ε.\n\nLimit laws: if (aₙ) → a and (bₙ) → b then (aₙ + bₙ) → a + b, (aₙbₙ) → ab, and (aₙ/bₙ) → a/b when b ≠ 0.\n\nSqueeze theorem: if aₙ ≤ bₙ ≤ cₙ and aₙ → L and cₙ → L then bₙ → L.',
+      examples:
+        'lim(1/n) = 0. lim(n/(n+1)) = 1. The sequence (−1)ⁿ diverges.',
+      confidenceLevel: 6,
+      linkedBookId: analysis.id,
+      pageStart: 23,
+      pageEnd: 55,
+      status: 'learning',
+    },
+  })
+
+  const setsLogic = await prisma.topic.create({
+    data: {
+      title: 'Sets and Set Operations',
+      subject: 'Proof Writing',
+      summary: 'Set builder notation, unions, intersections, subsets, power sets.',
+      notes:
+        'A set is a collection of objects. Key operations: A ∪ B (union), A ∩ B (intersection), A \\ B (difference), Aᶜ (complement), 𝒫(A) (power set).\n\nDe Morgan\'s laws: (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ and (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ.',
+      examples:
+        'If A = {1,2,3} and B = {2,3,4} then A ∪ B = {1,2,3,4} and A ∩ B = {2,3}.\n𝒫({1,2}) = {∅, {1}, {2}, {1,2}}.',
       confidenceLevel: 8,
-      linkedBookId: rudin.id,
-      pageStart: 47,
-      pageEnd: 78,
-      status: 'strong',
-    },
-  })
-
-  const vectorSpaces = await prisma.topic.create({
-    data: {
-      title: 'Vector Spaces',
-      subject: 'Linear Algebra',
-      summary: 'Axiomatic definition, subspaces, span, independence.',
-      notes: 'A vector space over F is a set V with addition and scalar multiplication satisfying 8 axioms. Key concepts: subspace (closed under addition and scalar multiplication), span, linear independence.',
-      confidenceLevel: 9,
-      linkedBookId: axler.id,
+      linkedBookId: proof.id,
       pageStart: 1,
-      pageEnd: 28,
+      pageEnd: 18,
       status: 'strong',
     },
   })
 
-  // Problems
-  await prisma.problem.create({
+  const logic = await prisma.topic.create({
     data: {
-      title: 'Show that every open ball is an open set',
-      sourceType: 'textbook',
-      linkedBookId: rudin.id,
-      topicId: metricSpaces.id,
-      chapterOrSection: 'Chapter 2',
-      pageNumber: 34,
-      problemStatement:
-        'Let (X, d) be a metric space and let p ∈ X, r > 0. Show that the open ball B(p, r) = {x ∈ X : d(x, p) < r} is an open set.',
-      difficulty: 'easy',
-      tags: 'metric spaces,open sets,topology',
-      status: 'solved',
-      attemptNotes: 'Pick any q ∈ B(p,r). Need to find δ such that B(q,δ) ⊂ B(p,r).',
-      finalSolution:
-        'Let h = r − d(p, q) > 0. Set δ = h. For any x ∈ B(q, δ), by triangle inequality d(x, p) ≤ d(x, q) + d(q, p) < δ + d(q,p) = h + d(q,p) = r. So x ∈ B(p,r).',
+      title: 'Logic and Propositions',
+      subject: 'Proof Writing',
+      summary: 'Propositional logic, truth tables, conditional statements, contrapositive.',
+      notes:
+        'A statement is a sentence that is either true or false. Key connectives: ∧ (and), ∨ (or), ¬ (not), → (if...then), ↔ (iff).\n\nContrapositive: P → Q is logically equivalent to ¬Q → ¬P.\nConverse: Q → P (not equivalent to P → Q).\nNegation of ∀x P(x) is ∃x ¬P(x).',
+      examples:
+        '"If n is even then n² is even" — contrapositive is "if n² is odd then n is odd".',
+      confidenceLevel: 9,
+      linkedBookId: proof.id,
+      pageStart: 19,
+      pageEnd: 40,
+      status: 'strong',
     },
   })
 
+  // ── Problems ─────────────────────────────────────────────────────────────
   await prisma.problem.create({
     data: {
-      title: 'Prove that the intersection of two open sets is open',
+      title: 'Abbott 1.2.1 — Supremum of a set',
       sourceType: 'textbook',
-      linkedBookId: rudin.id,
-      topicId: metricSpaces.id,
-      chapterOrSection: 'Chapter 2',
-      pageNumber: 36,
+      linkedBookId: analysis.id,
+      topicId: realNumbers.id,
+      chapterOrSection: 'Chapter 1',
+      pageNumber: 14,
       problemStatement:
-        'Let G₁ and G₂ be open sets in a metric space X. Prove that G₁ ∩ G₂ is open.',
+        'Let A ⊆ ℝ be nonempty and bounded above. Show that if s = sup A, then for every ε > 0 there exists a ∈ A with s − ε < a ≤ s.',
       difficulty: 'easy',
-      tags: 'metric spaces,open sets',
+      tags: 'supremum,completeness',
       status: 'solved',
       finalSolution:
-        'Let p ∈ G₁ ∩ G₂. Since G₁ open, ∃r₁>0 with B(p,r₁)⊂G₁. Since G₂ open, ∃r₂>0 with B(p,r₂)⊂G₂. Set r=min(r₁,r₂). Then B(p,r)⊂G₁∩G₂.',
+        'Since s − ε < s, and s = sup A, s − ε is not an upper bound for A. So there exists a ∈ A with a > s − ε. Since s is an upper bound, a ≤ s. Thus s − ε < a ≤ s.',
     },
   })
 
   await prisma.problem.create({
     data: {
-      title: 'Rudin Ch4 Ex 1: Continuity of |f|',
+      title: 'Abbott 1.2.6 — sup and inf relationship',
       sourceType: 'textbook',
-      linkedBookId: rudin.id,
-      topicId: continuity.id,
-      chapterOrSection: 'Chapter 4',
-      pageNumber: 98,
+      linkedBookId: analysis.id,
+      topicId: realNumbers.id,
+      chapterOrSection: 'Chapter 1',
+      pageNumber: 15,
       problemStatement:
-        'Suppose f is a real function defined on ℝ¹ and ε > 0. If f is continuous at x₀, prove that |f| is also continuous at x₀.',
-      difficulty: 'easy',
-      tags: 'continuity,absolute value',
-      status: 'solved_with_help',
-      attemptNotes: 'Tried using the definition directly but got confused with the absolute value inside.',
-      finalSolution:
-        '||f(x)| − |f(x₀)|| ≤ |f(x) − f(x₀)|. Since f is continuous, for any ε>0 there exists δ such that |f(x)−f(x₀)|<ε whenever |x−x₀|<δ. The same δ works for |f|.',
-      mistakesMade: 'Forgot the reverse triangle inequality ||a|−|b|| ≤ |a−b|.',
-    },
-  })
-
-  await prisma.problem.create({
-    data: {
-      title: 'Show limit of x·sin(1/x) as x→0 is 0',
-      sourceType: 'self',
-      topicId: continuity.id,
-      problemStatement: 'Evaluate lim_{x→0} x·sin(1/x) using the squeeze theorem.',
+        'Given sets A and B with the property that a ≤ b for all a ∈ A and b ∈ B, show that sup A ≤ inf B.',
       difficulty: 'medium',
-      tags: 'limits,squeeze theorem,continuity',
+      tags: 'supremum,infimum,completeness',
       status: 'solved',
       finalSolution:
-        '−|x| ≤ x·sin(1/x) ≤ |x| since |sin(1/x)| ≤ 1. As x→0, both −|x|→0 and |x|→0. By squeeze theorem, the limit is 0.',
+        'For any fixed b ∈ B, b is an upper bound for A, so sup A ≤ b. Since this holds for all b ∈ B, sup A is a lower bound for B, so sup A ≤ inf B.',
     },
   })
 
   await prisma.problem.create({
     data: {
-      title: 'Cauchy sequence that does not converge in ℚ',
+      title: 'Abbott 2.2.2 — Convergence of 1/√n',
       sourceType: 'textbook',
-      linkedBookId: rudin.id,
+      linkedBookId: analysis.id,
       topicId: sequences.id,
-      chapterOrSection: 'Chapter 3',
-      pageNumber: 59,
+      chapterOrSection: 'Chapter 2',
+      pageNumber: 37,
       problemStatement:
-        'Construct a Cauchy sequence of rationals that does not converge in ℚ, demonstrating that ℚ is not complete.',
-      difficulty: 'medium',
-      tags: 'Cauchy sequences,completeness,rationals',
+        'Using the ε-N definition, prove that the sequence (1/√n) converges to 0.',
+      difficulty: 'easy',
+      tags: 'sequences,convergence,epsilon-N',
+      status: 'solved',
+      finalSolution:
+        'Given ε > 0, choose N > 1/ε². Then for n ≥ N: |1/√n − 0| = 1/√n ≤ 1/√N < ε.',
+    },
+  })
+
+  await prisma.problem.create({
+    data: {
+      title: 'Abbott 2.3.1 — Limit of (2n+1)/(n+3)',
+      sourceType: 'textbook',
+      linkedBookId: analysis.id,
+      topicId: sequences.id,
+      chapterOrSection: 'Chapter 2',
+      pageNumber: 46,
+      problemStatement: 'Find lim(2n+1)/(n+3) and prove it using the definition of convergence.',
+      difficulty: 'easy',
+      tags: 'sequences,limit laws',
       status: 'attempted',
       attemptNotes:
-        'Idea: use decimal approximations of √2. Define xₙ as the truncation of √2 to n decimal places.',
+        'Dividing numerator and denominator by n gives (2 + 1/n)/(1 + 3/n) → 2/1 = 2. Need to make this rigorous with the ε-N definition.',
     },
   })
 
   await prisma.problem.create({
     data: {
-      title: 'Prove uniform continuity on compact sets',
+      title: 'Hammack 2.6 — Negate a quantified statement',
       sourceType: 'textbook',
-      linkedBookId: rudin.id,
-      topicId: continuity.id,
-      chapterOrSection: 'Chapter 4',
+      linkedBookId: proof.id,
+      topicId: logic.id,
+      chapterOrSection: 'Chapter 2',
+      pageNumber: 35,
       problemStatement:
-        'Let f: K → ℝ be continuous where K is compact. Prove that f is uniformly continuous on K.',
-      difficulty: 'hard',
-      tags: 'uniform continuity,compactness,continuity',
-      status: 'revisit',
-      attemptNotes:
-        'Idea: use open cover by balls of radius ε/2 around each point, extract finite subcover, take minimum δ. Details unclear.',
-      revisitDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        'Write the negation of the statement: "For every real number x, there exists a real number y such that y³ = x."',
+      difficulty: 'easy',
+      tags: 'logic,quantifiers,negation',
+      status: 'solved',
+      finalSolution:
+        'Negation: "There exists a real number x such that for all real numbers y, y³ ≠ x." (The original is actually true since cube root always exists in ℝ, so the negation is false.)',
     },
   })
 
-  // Journal entries — last 5 days to create a streak
+  await prisma.problem.create({
+    data: {
+      title: 'Prove A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)',
+      sourceType: 'textbook',
+      linkedBookId: proof.id,
+      topicId: setsLogic.id,
+      chapterOrSection: 'Chapter 1',
+      pageNumber: 12,
+      problemStatement:
+        'Prove the distributive law: A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) for sets A, B, C.',
+      difficulty: 'easy',
+      tags: 'sets,distributive law,proof',
+      status: 'solved',
+      finalSolution:
+        '(⊆) Let x ∈ A ∩ (B ∪ C). Then x ∈ A and x ∈ B ∪ C. Case 1: x ∈ B → x ∈ A ∩ B. Case 2: x ∈ C → x ∈ A ∩ C. Either way x ∈ (A∩B) ∪ (A∩C). (⊇) Reverse inclusion is symmetric.',
+    },
+  })
+
+  // ── Journal entries — last 5 days ────────────────────────────────────────
   const today = new Date()
-  for (let i = 4; i >= 0; i--) {
+  const entries = [
+    {
+      daysAgo: 4,
+      whatIStudied: 'Chapter 1 of Understanding Analysis — Axiom of Completeness and supremum definition.',
+      whatConfusedMe: 'Why ℚ fails completeness — had to re-read the √2 example twice.',
+      oneThingIUnderstood: 'The supremum doesn\'t need to be in the set — that was the key insight.',
+      pagesRead: 14,
+      durationMinutes: 60,
+      linkedBookId: analysis.id,
+      linkedTopicId: realNumbers.id,
+    },
+    {
+      daysAgo: 3,
+      whatIStudied: 'Finished Chapter 1 and started Chapter 2 of Abbott. Also read Chapter 1 of Book of Proof.',
+      whatConfusedMe: null,
+      oneThingIUnderstood: 'Set builder notation and how to read ∀ and ∃ properly.',
+      pagesRead: 18,
+      durationMinutes: 75,
+      linkedBookId: proof.id,
+      linkedTopicId: setsLogic.id,
+    },
+    {
+      daysAgo: 2,
+      whatIStudied: 'Sequences in Abbott Ch2 — epsilon-N definition and first examples.',
+      whatConfusedMe: 'How to choose N given ε — the algebra of working backwards from |aₙ − L| < ε.',
+      oneThingIUnderstood: 'You\'re always working backwards: assume the conclusion, find what N needs to be, then write the proof forwards.',
+      pagesRead: 12,
+      durationMinutes: 90,
+      linkedBookId: analysis.id,
+      linkedTopicId: sequences.id,
+    },
+    {
+      daysAgo: 1,
+      whatIStudied: 'Logic chapter in Book of Proof — truth tables, conditionals, contrapositive.',
+      whatConfusedMe: 'The difference between converse and contrapositive — kept mixing them up.',
+      oneThingIUnderstood: 'P → Q and ¬Q → ¬P are the same statement. P → Q and Q → P are NOT.',
+      pagesRead: 16,
+      durationMinutes: 70,
+      linkedBookId: proof.id,
+      linkedTopicId: logic.id,
+    },
+    {
+      daysAgo: 0,
+      whatIStudied: 'Limit laws and squeeze theorem in Abbott. Worked through practice problems.',
+      whatConfusedMe: 'The squeeze theorem proof — why both outer sequences must converge to the SAME limit.',
+      oneThingIUnderstood: 'Algebraic limit theorem: once you know two sequences converge you get convergence of sums/products for free.',
+      pagesRead: 8,
+      durationMinutes: 55,
+      linkedBookId: analysis.id,
+      linkedTopicId: sequences.id,
+    },
+  ]
+
+  for (const entry of entries) {
     const entryDate = new Date(today)
-    entryDate.setDate(today.getDate() - i)
+    entryDate.setDate(today.getDate() - entry.daysAgo)
     entryDate.setHours(12, 0, 0, 0)
 
+    const { daysAgo, ...data } = entry
     await prisma.journalEntry.create({
-      data: {
-        date: entryDate,
-        whatIStudied: i === 0
-          ? 'Continuity at a point — epsilon-delta definition. Worked through Rudin Ch4 opening examples.'
-          : i === 1
-          ? 'Revisited compact sets and Heine-Borel theorem. Re-read the proof twice.'
-          : i === 2
-          ? 'Worked on problems from Chapter 3 — Cauchy sequences and completeness.'
-          : i === 3
-          ? 'Introduction to continuity chapter. Read pages 83–90 and took notes.'
-          : 'Finished metric spaces chapter. Reviewed all definitions and theorems.',
-        whatConfusedMe: i === 0
-          ? 'The topological characterisation of continuity — how preimages of open sets connect to epsilon-delta.'
-          : i === 1
-          ? 'Why exactly sequential compactness implies compactness in metric spaces but not general topological spaces.'
-          : i === 2
-          ? 'The diagonal argument in the proof that ℝ is uncountable.'
-          : null,
-        oneThingIUnderstood: i === 0
-          ? 'The intuition behind delta depending on both epsilon AND the point p (non-uniform continuity).'
-          : i === 1
-          ? 'Heine-Borel: closed + bounded ↔ compact, but only works in ℝⁿ, not general metric spaces.'
-          : i === 2
-          ? 'Cauchy sequences capture convergence without knowing the limit — powerful for proving completeness.'
-          : 'The triangle inequality is what makes distance functions useful — it bounds how indirect paths can be.',
-        pagesRead: [8, 6, 7, 9, 5][i],
-        linkedBookId: rudin.id,
-        linkedTopicId: i <= 1 ? continuity.id : i === 2 ? sequences.id : metricSpaces.id,
-        durationMinutes: [90, 75, 60, 80, 45][i],
-      },
+      data: { ...data, date: entryDate },
     })
   }
 
-  // Questions
+  // ── Questions ────────────────────────────────────────────────────────────
   await prisma.question.create({
     data: {
-      text: 'Why does the proof of Heine-Borel only work in ℝⁿ and not in general metric spaces?',
-      linkedBookId: rudin.id,
-      linkedTopicId: metricSpaces.id,
-      pageNumber: 45,
+      text: 'Does the Archimedean Property follow from the Axiom of Completeness, or is it a separate axiom?',
+      linkedBookId: analysis.id,
+      linkedTopicId: realNumbers.id,
+      pageNumber: 11,
       status: 'open',
     },
   })
 
   await prisma.question.create({
     data: {
-      text: 'Is uniform continuity equivalent to the function extending continuously to the closure of its domain?',
-      linkedBookId: rudin.id,
-      linkedTopicId: continuity.id,
-      pageNumber: 91,
+      text: 'When choosing N in an epsilon-N proof, does N have to be an integer or can it be any real number?',
+      linkedBookId: analysis.id,
+      linkedTopicId: sequences.id,
+      pageNumber: 32,
       status: 'open',
     },
   })
 
   await prisma.question.create({
     data: {
-      text: 'What is the difference between a limit point and an accumulation point? Are they always the same?',
-      linkedBookId: rudin.id,
-      linkedTopicId: metricSpaces.id,
-      pageNumber: 38,
+      text: 'Is every conditional statement with a false hypothesis vacuously true? That seems weird.',
+      linkedBookId: proof.id,
+      linkedTopicId: logic.id,
+      pageNumber: 24,
       status: 'understood',
     },
   })
