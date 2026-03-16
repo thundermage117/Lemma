@@ -1,9 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
+const seedUserId = process.env.SEED_USER_ID ?? '00000000-0000-0000-0000-000000000000'
 
 async function main() {
   console.log('Seeding database...')
+
+  if (!process.env.SEED_USER_ID) {
+    console.warn('SEED_USER_ID not set; using fallback userId 00000000-0000-0000-0000-000000000000')
+  }
 
   // Clean existing data
   await prisma.question.deleteMany()
@@ -15,6 +20,7 @@ async function main() {
   // ── Books ────────────────────────────────────────────────────────────────
   const analysis = await prisma.book.create({
     data: {
+      userId: seedUserId,
       title: 'Understanding Analysis',
       author: 'Stephen Abbott',
       subject: 'Real Analysis',
@@ -30,6 +36,7 @@ async function main() {
 
   const proof = await prisma.book.create({
     data: {
+      userId: seedUserId,
       title: 'Book of Proof',
       author: 'Richard Hammack',
       subject: 'Proof Writing',
@@ -45,6 +52,7 @@ async function main() {
 
   await prisma.book.create({
     data: {
+      userId: seedUserId,
       title: 'Abstract Algebra',
       author: 'David S. Dummit & Richard M. Foote',
       subject: 'Abstract Algebra',
@@ -60,6 +68,7 @@ async function main() {
   // ── Topics ───────────────────────────────────────────────────────────────
   const realNumbers = await prisma.topic.create({
     data: {
+      userId: seedUserId,
       title: 'The Real Numbers',
       subject: 'Real Analysis',
       summary: 'Axiom of Completeness, Archimedean Property, and density of ℚ in ℝ.',
@@ -77,6 +86,7 @@ async function main() {
 
   const sequences = await prisma.topic.create({
     data: {
+      userId: seedUserId,
       title: 'Sequences and Limits',
       subject: 'Real Analysis',
       summary: 'Epsilon-N definition of convergence, limit laws, squeeze theorem.',
@@ -94,6 +104,7 @@ async function main() {
 
   const setsLogic = await prisma.topic.create({
     data: {
+      userId: seedUserId,
       title: 'Sets and Set Operations',
       subject: 'Proof Writing',
       summary: 'Set builder notation, unions, intersections, subsets, power sets.',
@@ -111,6 +122,7 @@ async function main() {
 
   const logic = await prisma.topic.create({
     data: {
+      userId: seedUserId,
       title: 'Logic and Propositions',
       subject: 'Proof Writing',
       summary: 'Propositional logic, truth tables, conditional statements, contrapositive.',
@@ -129,6 +141,7 @@ async function main() {
   // ── Problems ─────────────────────────────────────────────────────────────
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Abbott 1.2.1 — Supremum of a set',
       sourceType: 'textbook',
       linkedBookId: analysis.id,
@@ -147,6 +160,7 @@ async function main() {
 
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Abbott 1.2.6 — sup and inf relationship',
       sourceType: 'textbook',
       linkedBookId: analysis.id,
@@ -165,6 +179,7 @@ async function main() {
 
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Abbott 2.2.2 — Convergence of 1/√n',
       sourceType: 'textbook',
       linkedBookId: analysis.id,
@@ -183,6 +198,7 @@ async function main() {
 
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Abbott 2.3.1 — Limit of (2n+1)/(n+3)',
       sourceType: 'textbook',
       linkedBookId: analysis.id,
@@ -200,6 +216,7 @@ async function main() {
 
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Hammack 2.6 — Negate a quantified statement',
       sourceType: 'textbook',
       linkedBookId: proof.id,
@@ -218,6 +235,7 @@ async function main() {
 
   await prisma.problem.create({
     data: {
+      userId: seedUserId,
       title: 'Prove A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)',
       sourceType: 'textbook',
       linkedBookId: proof.id,
@@ -296,13 +314,14 @@ async function main() {
 
     const { daysAgo, ...data } = entry
     await prisma.journalEntry.create({
-      data: { ...data, date: entryDate },
+      data: { ...data, date: entryDate, userId: seedUserId },
     })
   }
 
   // ── Questions ────────────────────────────────────────────────────────────
   await prisma.question.create({
     data: {
+      userId: seedUserId,
       text: 'Does the Archimedean Property follow from the Axiom of Completeness, or is it a separate axiom?',
       linkedBookId: analysis.id,
       linkedTopicId: realNumbers.id,
@@ -313,6 +332,7 @@ async function main() {
 
   await prisma.question.create({
     data: {
+      userId: seedUserId,
       text: 'When choosing N in an epsilon-N proof, does N have to be an integer or can it be any real number?',
       linkedBookId: analysis.id,
       linkedTopicId: sequences.id,
@@ -323,6 +343,7 @@ async function main() {
 
   await prisma.question.create({
     data: {
+      userId: seedUserId,
       text: 'Is every conditional statement with a false hypothesis vacuously true? That seems weird.',
       linkedBookId: proof.id,
       linkedTopicId: logic.id,
