@@ -10,16 +10,26 @@ Lemma is a personal learning tracker with a React frontend, Express/Node.js back
 | Backend  | Express + Node.js + TypeScript    |
 | ORM      | Prisma                            |
 | Database | PostgreSQL (Supabase)             |
+| Auth     | Supabase Auth (JWT)               |
 | Hosting  | Render (API), static or local (client) |
 
 ## Request Flow
 
 ```
 Browser (Vite / static)
+  → Supabase Auth (email/password, access token)
   → Express API (Render, port 3001 locally / 10000 on Render)
+    → JWT verification (Supabase JWKS)
     → Prisma ORM
       → PostgreSQL (Supabase, via PgBouncer pooler)
 ```
+
+## Authentication and Authorization
+
+- Supabase Auth issues JWT access tokens to the client.
+- Client sends bearer token on every `/api/*` request.
+- Express verifies JWT issuer/audience and extracts `userId` from `sub`.
+- Services enforce per-user ownership by scoping all queries/mutations to `userId`.
 
 ## API Security Middleware
 
@@ -49,3 +59,5 @@ See [decisions/](decisions/) for ADRs:
 - [003 - Render for API deployment](decisions/003-render-deployment.md)
 - [004 - React Query for client-side caching](decisions/004-react-query-caching.md)
 - [005 - API security middleware hardening](decisions/005-api-security-middleware-hardening.md)
+- [006 - Supabase Auth and user-scoped data access](decisions/006-supabase-auth-and-user-scoped-data.md)
+- [007 - User ownership migration strategy](decisions/007-user-ownership-migration-strategy.md)

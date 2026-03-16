@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 
 const nav = [
@@ -56,8 +58,19 @@ const nav = [
 
 export function Sidebar() {
   const { theme, toggleTheme } = useTheme()
+  const { user, signOut } = useAuth()
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   const isDark = theme === 'dark'
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true)
+    try {
+      await signOut()
+    } finally {
+      setIsSigningOut(false)
+    }
+  }
 
   return (
     <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
@@ -95,6 +108,12 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-5 py-4 border-t border-slate-200 space-y-3">
+        <div className="space-y-1">
+          <p className="text-xs text-slate-400">Signed in as</p>
+          <p className="text-xs text-slate-600 truncate" title={user?.email ?? undefined}>
+            {user?.email ?? 'Unknown user'}
+          </p>
+        </div>
         <button
           type="button"
           onClick={toggleTheme}
@@ -112,7 +131,14 @@ export function Sidebar() {
             </svg>
           )}
         </button>
-        <p className="text-xs text-slate-400">Local · Single user</p>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="w-full inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50"
+        >
+          {isSigningOut ? 'Signing out...' : 'Sign out'}
+        </button>
       </div>
     </aside>
   )

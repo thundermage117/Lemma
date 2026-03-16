@@ -20,7 +20,8 @@ A personal math study OS. Track reading progress, organise topic notes, log prac
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Node.js + Express + TypeScript
 - **Database**: PostgreSQL (via Prisma ORM)
-- **Architecture**: local-first, single user, no authentication
+- **Authentication**: Supabase Auth (JWT)
+- **Authorization**: per-user data isolation in API services
 
 ## 🗂 Project Structure
 
@@ -47,6 +48,7 @@ lemma/
 - Node.js ≥ 18
 - npm
 - PostgreSQL (local install or hosted)
+- Supabase project (Auth + Postgres)
 
 ## 🔒 API Security Defaults
 
@@ -59,6 +61,12 @@ The Express API ships with baseline hardening middleware:
 
 Set these in `server/.env` for production.
 
+## 🔐 Authentication
+
+- Client login/signup uses Supabase Auth email+password.
+- Every `/api/*` request requires `Authorization: Bearer <access_token>`.
+- Server verifies JWTs against Supabase JWKS and scopes all reads/writes by `userId`.
+
 ## 🚀 Getting Started
 
 ```bash
@@ -66,6 +74,7 @@ git clone <repo-url>
 cd lemma
 make install
 cp server/.env.example server/.env
+cp client/.env.example client/.env
 make migrate
 make seed
 ```
@@ -88,6 +97,8 @@ cd client && npm run dev
 ```
 
 Open `http://localhost:5173`.
+
+Set `SEED_USER_ID` in `server/.env` to your Supabase Auth user UUID if you want seeded records to appear in your account.
 
 ### Reset and re-seed
 
@@ -120,6 +131,8 @@ Compiles the server TypeScript and builds the client bundle to `client/dist/`.
 | GET/POST | `/api/questions` | List or create questions |
 | PUT/DELETE | `/api/questions/:id` | Update or delete a question |
 | GET | `/api/dashboard/summary` | Aggregated dashboard data |
+
+All routes above require a valid Supabase access token.
 
 ## 📈 Roadmap
 

@@ -4,6 +4,7 @@ build/
 *.db
 *.db-journal
 .env
+client/.env
 .DS_Store
 .vscode/
 *.log
