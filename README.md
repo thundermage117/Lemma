@@ -55,6 +55,7 @@ lemma/
 The Express API ships with baseline hardening middleware:
 
 - `helmet` security headers
+- Content Security Policy (CSP) with app-specific directives (`CSP_REPORT_ONLY`, `CSP_EXTRA_CONNECT_SRC`)
 - CORS allowlist (`ALLOWED_ORIGINS`, with same-origin allowed automatically)
 - JSON/form body size limits (`REQUEST_BODY_LIMIT`)
 - IP rate limiting on `/api/*` (`RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS`)

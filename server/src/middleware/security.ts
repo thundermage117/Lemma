@@ -9,11 +9,24 @@ const parsePositiveInt = (value: string | undefined, fallback: number): number =
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
-const parseAllowedOrigins = (value: string | undefined): string[] => {
-  const origins = value
+const parseCsv = (value: string | undefined): string[] =>
+  value
     ?.split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean)
+    .map((entry) => entry.trim())
+    .filter(Boolean) ?? []
+
+const tryGetOrigin = (value: string | undefined): string | undefined => {
+  if (!value) return undefined
+
+  try {
+    return new URL(value).origin
+  } catch {
+    return undefined
+  }
+}
+
+const parseAllowedOrigins = (value: string | undefined): string[] => {
+  const origins = parseCsv(value)
 
   return origins && origins.length > 0 ? origins : DEFAULT_ALLOWED_ORIGINS
 }
@@ -21,12 +34,41 @@ const parseAllowedOrigins = (value: string | undefined): string[] => {
 const allowedOrigins = parseAllowedOrigins(process.env.ALLOWED_ORIGINS)
 const rateLimitWindowMs = parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000)
 const rateLimitMaxRequests = parsePositiveInt(process.env.RATE_LIMIT_MAX_REQUESTS, 300)
+const supabaseOrigin = tryGetOrigin(process.env.SUPABASE_URL?.trim())
+const supabaseWebsocketOrigin = supabaseOrigin?.replace(/^http/i, 'ws')
+const extraConnectSources = parseCsv(process.env.CSP_EXTRA_CONNECT_SRC)
+const cspReportOnly = process.env.CSP_REPORT_ONLY?.trim().toLowerCase() === 'true'
+const connectSources = [
+  "'self'",
+  ...(supabaseOrigin ? [supabaseOrigin] : []),
+  ...(supabaseWebsocketOrigin ? [supabaseWebsocketOrigin] : []),
+  ...extraConnectSources,
+]
 
 export const trustProxyHops = process.env.NODE_ENV === 'production' ? 1 : 0
 export const requestBodyLimit = process.env.REQUEST_BODY_LIMIT?.trim() || '64kb'
 
 export const securityHeaders = helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    reportOnly: cspReportOnly,
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'none'"],
+      objectSrc: ["'none'"],
+      // Browsers ignore this directive in report-only mode and log a warning.
+      // Keep it for enforced CSP, skip it while report-only is enabled.
+      upgradeInsecureRequests: cspReportOnly ? null : [],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      imgSrc: ["'self'", 'data:', 'blob:'],
+      connectSrc: connectSources,
+      workerSrc: ["'self'", 'blob:'],
+      frameSrc: ["'self'", 'blob:'],
+    },
+  },
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: false,
 })
