@@ -21,6 +21,16 @@ Browser (Vite / static)
       → PostgreSQL (Supabase, via PgBouncer pooler)
 ```
 
+## API Security Middleware
+
+Express applies a baseline middleware stack before route handlers:
+
+- `helmet` for secure HTTP headers
+- CORS allowlist via `ALLOWED_ORIGINS` (same-origin is allowed automatically)
+- request body size limits via `REQUEST_BODY_LIMIT`
+- IP-based rate limiting on `/api/*` (`RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS`)
+- centralized API 404 + error handlers (sanitized JSON errors)
+
 ## Local Development
 
 ```
@@ -38,3 +48,4 @@ See [decisions/](decisions/) for ADRs:
 - [002 - Supabase for PostgreSQL hosting](decisions/002-supabase-postgres-hosting.md)
 - [003 - Render for API deployment](decisions/003-render-deployment.md)
 - [004 - React Query for client-side caching](decisions/004-react-query-caching.md)
+- [005 - API security middleware hardening](decisions/005-api-security-middleware-hardening.md)

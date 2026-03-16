@@ -48,6 +48,17 @@ lemma/
 - npm
 - PostgreSQL (local install or hosted)
 
+## 🔒 API Security Defaults
+
+The Express API ships with baseline hardening middleware:
+
+- `helmet` security headers
+- CORS allowlist (`ALLOWED_ORIGINS`, with same-origin allowed automatically)
+- JSON/form body size limits (`REQUEST_BODY_LIMIT`)
+- IP rate limiting on `/api/*` (`RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS`)
+
+Set these in `server/.env` for production.
+
 ## 🚀 Getting Started
 
 ```bash

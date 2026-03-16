@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import express from 'express'
-import cors from 'cors'
 import path from 'path'
 import fs from 'fs'
 
@@ -10,13 +9,27 @@ import problemsRouter from './routes/problems'
 import journalRouter from './routes/journal'
 import questionsRouter from './routes/questions'
 import dashboardRouter from './routes/dashboard'
+import { apiNotFoundHandler, errorHandler } from './middleware/errorHandler'
+import {
+  apiRateLimiter,
+  corsMiddleware,
+  requestBodyLimit,
+  securityHeaders,
+  trustProxyHops,
+} from './middleware/security'
 
 const app = express()
 const PORT = process.env.PORT ?? 3001
 const clientDistPath = path.join(__dirname, '../../client/dist')
 
-app.use(cors())
-app.use(express.json())
+app.set('trust proxy', trustProxyHops)
+app.disable('x-powered-by')
+
+app.use(securityHeaders)
+app.use(corsMiddleware)
+app.use(express.json({ limit: requestBodyLimit }))
+app.use(express.urlencoded({ extended: true, limit: requestBodyLimit }))
+app.use('/api', apiRateLimiter)
 app.use('/books', express.static(path.join(__dirname, '../../books')))
 
 app.use('/api/books', booksRouter)
@@ -25,6 +38,7 @@ app.use('/api/problems', problemsRouter)
 app.use('/api/journal', journalRouter)
 app.use('/api/questions', questionsRouter)
 app.use('/api/dashboard', dashboardRouter)
+app.use('/api', apiNotFoundHandler)
 
 if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath))
@@ -39,6 +53,8 @@ if (fs.existsSync(clientDistPath)) {
     res.sendFile(path.join(clientDistPath, 'index.html'))
   })
 }
+
+app.use(errorHandler)
 
 app.listen(PORT, () => {
   console.log(`Lemma server running on http://localhost:${PORT}`)
