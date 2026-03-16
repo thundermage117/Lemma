@@ -2,7 +2,7 @@ import { prisma } from '../lib/prisma'
 import { computeStreaks } from './streakService'
 import { normalizeProblem } from './problemsService'
 
-export const getSummary = async () => {
+export const getSummary = async (userId: string) => {
   const [
     activeBook,
     allDates,
@@ -12,12 +12,13 @@ export const getSummary = async () => {
     recentJournalEntries,
     recentProblemsRaw,
   ] = await Promise.all([
-    prisma.book.findFirst({ where: { isActive: true } }),
-    prisma.journalEntry.findMany({ select: { date: true } }),
-    prisma.topic.count(),
-    prisma.problem.count(),
-    prisma.question.count({ where: { status: 'open' } }),
+    prisma.book.findFirst({ where: { userId, isActive: true } }),
+    prisma.journalEntry.findMany({ where: { userId }, select: { date: true } }),
+    prisma.topic.count({ where: { userId } }),
+    prisma.problem.count({ where: { userId } }),
+    prisma.question.count({ where: { userId, status: 'open' } }),
     prisma.journalEntry.findMany({
+      where: { userId },
       include: {
         book: { select: { id: true, title: true } },
         topic: { select: { id: true, title: true } },
@@ -26,6 +27,7 @@ export const getSummary = async () => {
       take: 3,
     }),
     prisma.problem.findMany({
+      where: { userId },
       include: {
         book: { select: { id: true, title: true } },
         topic: { select: { id: true, title: true } },
@@ -45,7 +47,7 @@ export const getSummary = async () => {
   todayEnd.setHours(23, 59, 59, 999)
 
   const todayJournal = await prisma.journalEntry.findFirst({
-    where: { date: { gte: todayStart, lte: todayEnd } },
+    where: { userId, date: { gte: todayStart, lte: todayEnd } },
   })
 
   return {

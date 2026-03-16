@@ -3,13 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model Book {
   id             Int      @id @default(autoincrement())
+  userId         String   @db.Uuid
   title          String
   author         String
   subject        String
@@ -27,10 +28,13 @@ model Book {
   problems       Problem[]
   journalEntries JournalEntry[]
   questions      Question[]
+
+  @@index([userId])
 }
 
 model Topic {
   id              Int      @id @default(autoincrement())
+  userId          String   @db.Uuid
   title           String
   subject         String
   summary         String?
@@ -48,10 +52,13 @@ model Topic {
   problems       Problem[]
   journalEntries JournalEntry[]
   questions      Question[]
+
+  @@index([userId])
 }
 
 model Problem {
   id               Int       @id @default(autoincrement())
+  userId           String    @db.Uuid
   title            String
   sourceType       String    @default("textbook")
   linkedBookId     Int?
@@ -71,10 +78,13 @@ model Problem {
 
   book  Book?  @relation(fields: [linkedBookId], references: [id])
   topic Topic? @relation(fields: [topicId], references: [id])
+
+  @@index([userId])
 }
 
 model JournalEntry {
   id                  Int      @id @default(autoincrement())
+  userId              String   @db.Uuid
   date                DateTime @default(now())
   whatIStudied        String
   whatConfusedMe      String?
@@ -88,10 +98,13 @@ model JournalEntry {
 
   book  Book?  @relation(fields: [linkedBookId], references: [id])
   topic Topic? @relation(fields: [linkedTopicId], references: [id])
+
+  @@index([userId])
 }
 
 model Question {
   id            Int      @id @default(autoincrement())
+  userId        String   @db.Uuid
   text          String
   linkedBookId  Int?
   linkedTopicId Int?
@@ -102,4 +115,6 @@ model Question {
 
   book  Book?  @relation(fields: [linkedBookId], references: [id])
   topic Topic? @relation(fields: [linkedTopicId], references: [id])
+
+  @@index([userId])
 }

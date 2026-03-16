@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma'
 
 export interface BookInput {
@@ -13,34 +14,68 @@ export interface BookInput {
   isActive?: boolean
 }
 
-export const getAll = async () => {
-  return prisma.book.findMany({ orderBy: { updatedAt: 'desc' } })
+const setInactiveBooks = async (tx: Prisma.TransactionClient, userId: string) => {
+  await tx.book.updateMany({ where: { userId }, data: { isActive: false } })
 }
 
-export const getById = async (id: number) => {
-  return prisma.book.findUnique({ where: { id } })
+const findOwnedBook = async (tx: Prisma.TransactionClient, userId: string, id: number) => {
+  return tx.book.findFirst({ where: { id, userId } })
 }
 
-export const create = async (data: BookInput) => {
+const updateOwnedBook = async (
+  tx: Prisma.TransactionClient,
+  userId: string,
+  id: number,
+  data: Partial<BookInput>
+) => {
+  const result = await tx.book.updateMany({ where: { id, userId }, data })
+
+  if (result.count === 0) {
+    throw new Error('Book not found')
+  }
+
+  const updatedBook = await findOwnedBook(tx, userId, id)
+  if (!updatedBook) {
+    throw new Error('Book not found')
+  }
+
+  return updatedBook
+}
+
+export const getAll = async (userId: string) => {
+  return prisma.book.findMany({ where: { userId }, orderBy: { updatedAt: 'desc' } })
+}
+
+export const getById = async (userId: string, id: number) => {
+  return prisma.book.findFirst({ where: { id, userId } })
+}
+
+export const create = async (userId: string, data: BookInput) => {
   if (data.isActive) {
     return prisma.$transaction(async (tx) => {
-      await tx.book.updateMany({ data: { isActive: false } })
-      return tx.book.create({ data })
+      await setInactiveBooks(tx, userId)
+      return tx.book.create({ data: { ...data, userId } })
     })
   }
-  return prisma.book.create({ data })
+
+  return prisma.book.create({ data: { ...data, userId } })
 }
 
-export const update = async (id: number, data: Partial<BookInput>) => {
+export const update = async (userId: string, id: number, data: Partial<BookInput>) => {
   if (data.isActive) {
     return prisma.$transaction(async (tx) => {
-      await tx.book.updateMany({ data: { isActive: false } })
-      return tx.book.update({ where: { id }, data })
+      await setInactiveBooks(tx, userId)
+      return updateOwnedBook(tx, userId, id, data)
     })
   }
-  return prisma.book.update({ where: { id }, data })
+
+  return prisma.$transaction(async (tx) => updateOwnedBook(tx, userId, id, data))
 }
 
-export const remove = async (id: number) => {
-  return prisma.book.delete({ where: { id } })
+export const remove = async (userId: string, id: number) => {
+  const result = await prisma.book.deleteMany({ where: { id, userId } })
+
+  if (result.count === 0) {
+    throw new Error('Book not found')
+  }
 }

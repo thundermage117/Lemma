@@ -9,6 +9,7 @@ import problemsRouter from './routes/problems'
 import journalRouter from './routes/journal'
 import questionsRouter from './routes/questions'
 import dashboardRouter from './routes/dashboard'
+import { requireAuth } from './middleware/auth'
 import { apiNotFoundHandler, errorHandler } from './middleware/errorHandler'
 import {
   apiRateLimiter,
@@ -30,6 +31,7 @@ app.use(corsMiddleware)
 app.use(express.json({ limit: requestBodyLimit }))
 app.use(express.urlencoded({ extended: true, limit: requestBodyLimit }))
 app.use('/api', apiRateLimiter)
+app.use('/api', requireAuth)
 app.use('/books', express.static(path.join(__dirname, '../../books')))
 
 app.use('/api/books', booksRouter)
