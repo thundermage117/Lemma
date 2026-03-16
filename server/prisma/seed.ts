@@ -1,21 +1,60 @@
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
-const seedUserId = process.env.SEED_USER_ID ?? '00000000-0000-0000-0000-000000000000'
+const fallbackSeedUserId = '00000000-0000-0000-0000-000000000000'
+
+const parseCsv = (value: string | undefined): string[] =>
+  value
+    ?.split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean) ?? []
+
+const unique = (values: string[]) => Array.from(new Set(values))
+const isUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+
+const assertValidUuids = (values: string[]) => {
+  const invalid = values.filter((value) => !isUuid(value))
+  if (invalid.length > 0) {
+    throw new Error(`Invalid SEED_USER_ID(S): ${invalid.join(', ')}`)
+  }
+}
+
+const getSeedUserIds = (): string[] => {
+  const idsFromCsv = parseCsv(process.env.SEED_USER_IDS)
+  if (idsFromCsv.length > 0) {
+    const deduped = unique(idsFromCsv)
+    assertValidUuids(deduped)
+    return deduped
+  }
+
+  // Backward-compatibility: also accept comma-separated values in SEED_USER_ID.
+  const idsFromSingle = parseCsv(process.env.SEED_USER_ID)
+  if (idsFromSingle.length > 0) {
+    const deduped = unique(idsFromSingle)
+    assertValidUuids(deduped)
+    return deduped
+  }
+
+  console.warn(`SEED_USER_ID(S) not set; using fallback userId ${fallbackSeedUserId}`)
+  return [fallbackSeedUserId]
+}
 
 async function main() {
   console.log('Seeding database...')
-
-  if (!process.env.SEED_USER_ID) {
-    console.warn('SEED_USER_ID not set; using fallback userId 00000000-0000-0000-0000-000000000000')
-  }
+  const seedUserIds = getSeedUserIds()
+  console.log(`Target seed users: ${seedUserIds.join(', ')}`)
 
   // Clean existing data
-  await prisma.question.deleteMany()
-  await prisma.journalEntry.deleteMany()
-  await prisma.problem.deleteMany()
-  await prisma.topic.deleteMany()
-  await prisma.book.deleteMany()
+  await prisma.question.deleteMany({ where: { userId: { in: seedUserIds } } })
+  await prisma.journalEntry.deleteMany({ where: { userId: { in: seedUserIds } } })
+  await prisma.problem.deleteMany({ where: { userId: { in: seedUserIds } } })
+  await prisma.topic.deleteMany({ where: { userId: { in: seedUserIds } } })
+  await prisma.book.deleteMany({ where: { userId: { in: seedUserIds } } })
+
+  for (const seedUserId of seedUserIds) {
+    console.log(`Seeding records for user ${seedUserId}...`)
 
   // ── Books ────────────────────────────────────────────────────────────────
   const analysis = await prisma.book.create({
@@ -351,8 +390,9 @@ async function main() {
       status: 'understood',
     },
   })
+  }
 
-  console.log('Seeding complete.')
+  console.log(`Seeding complete for ${seedUserIds.length} user(s).`)
 }
 
 main()
