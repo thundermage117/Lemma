@@ -1,43 +1,30 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as questionsApi from '../api/questions'
-import type { Question, CreateQuestionInput, UpdateQuestionInput, QuestionStatus } from '../types'
+import type { CreateQuestionInput, UpdateQuestionInput, QuestionStatus } from '../types'
 
 export function useQuestions(status?: QuestionStatus) {
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['questions'] })
 
-  const fetchQuestions = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await questionsApi.getAll(status)
-      setQuestions(data)
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }, [status])
+  const query = useQuery({
+    queryKey: ['questions', status],
+    queryFn: () => questionsApi.getAll(status),
+  })
 
-  useEffect(() => { fetchQuestions() }, [fetchQuestions])
+  const createMutation = useMutation({ mutationFn: questionsApi.create, onSuccess: invalidate })
+  const updateMutation = useMutation({
+    mutationFn: ({ id, input }: { id: number; input: UpdateQuestionInput }) => questionsApi.update(id, input),
+    onSuccess: invalidate,
+  })
+  const deleteMutation = useMutation({ mutationFn: questionsApi.remove, onSuccess: invalidate })
 
-  const createQuestion = useCallback(async (input: CreateQuestionInput) => {
-    const question = await questionsApi.create(input)
-    setQuestions((prev) => [question, ...prev])
-    return question
-  }, [])
-
-  const updateQuestion = useCallback(async (id: number, input: UpdateQuestionInput) => {
-    const question = await questionsApi.update(id, input)
-    setQuestions((prev) => prev.map((q) => (q.id === id ? question : q)))
-    return question
-  }, [])
-
-  const deleteQuestion = useCallback(async (id: number) => {
-    await questionsApi.remove(id)
-    setQuestions((prev) => prev.filter((q) => q.id !== id))
-  }, [])
-
-  return { questions, loading, error, refetch: fetchQuestions, createQuestion, updateQuestion, deleteQuestion }
+  return {
+    questions: query.data ?? [],
+    loading: query.isPending,
+    error: query.error?.message ?? null,
+    refetch: query.refetch,
+    createQuestion: (input: CreateQuestionInput) => createMutation.mutateAsync(input),
+    updateQuestion: (id: number, input: UpdateQuestionInput) => updateMutation.mutateAsync({ id, input }),
+    deleteQuestion: (id: number) => deleteMutation.mutateAsync(id),
+  }
 }

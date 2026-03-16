@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as problemsApi from '../api/problems'
-import type { Problem, CreateProblemInput, UpdateProblemInput, ProblemStatus, Difficulty } from '../types'
+import type { CreateProblemInput, UpdateProblemInput, ProblemStatus, Difficulty } from '../types'
 
 export function useProblems(filters?: {
   status?: ProblemStatus
@@ -8,41 +8,28 @@ export function useProblems(filters?: {
   topicId?: number
   bookId?: number
 }) {
-  const [problems, setProblems] = useState<Problem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['problems'] })
 
-  const fetchProblems = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await problemsApi.getAll(filters)
-      setProblems(data)
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }, [filters?.status, filters?.difficulty, filters?.topicId, filters?.bookId]) // eslint-disable-line react-hooks/exhaustive-deps
+  const query = useQuery({
+    queryKey: ['problems', filters?.status, filters?.difficulty, filters?.topicId, filters?.bookId],
+    queryFn: () => problemsApi.getAll(filters),
+  })
 
-  useEffect(() => { fetchProblems() }, [fetchProblems])
+  const createMutation = useMutation({ mutationFn: problemsApi.create, onSuccess: invalidate })
+  const updateMutation = useMutation({
+    mutationFn: ({ id, input }: { id: number; input: UpdateProblemInput }) => problemsApi.update(id, input),
+    onSuccess: invalidate,
+  })
+  const deleteMutation = useMutation({ mutationFn: problemsApi.remove, onSuccess: invalidate })
 
-  const createProblem = useCallback(async (input: CreateProblemInput) => {
-    const problem = await problemsApi.create(input)
-    setProblems((prev) => [problem, ...prev])
-    return problem
-  }, [])
-
-  const updateProblem = useCallback(async (id: number, input: UpdateProblemInput) => {
-    const problem = await problemsApi.update(id, input)
-    setProblems((prev) => prev.map((p) => (p.id === id ? problem : p)))
-    return problem
-  }, [])
-
-  const deleteProblem = useCallback(async (id: number) => {
-    await problemsApi.remove(id)
-    setProblems((prev) => prev.filter((p) => p.id !== id))
-  }, [])
-
-  return { problems, loading, error, refetch: fetchProblems, createProblem, updateProblem, deleteProblem }
+  return {
+    problems: query.data ?? [],
+    loading: query.isPending,
+    error: query.error?.message ?? null,
+    refetch: query.refetch,
+    createProblem: (input: CreateProblemInput) => createMutation.mutateAsync(input),
+    updateProblem: (id: number, input: UpdateProblemInput) => updateMutation.mutateAsync({ id, input }),
+    deleteProblem: (id: number) => deleteMutation.mutateAsync(id),
+  }
 }
