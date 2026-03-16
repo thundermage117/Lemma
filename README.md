@@ -146,4 +146,4 @@ Lemma is built around the workflow of working through a rigorous math text: read
 
 ## 📜 License
 
-MIT
+GNU General Public License v3.0 — see [LICENSE](LICENSE) for details.
