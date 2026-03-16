@@ -27,7 +27,7 @@ A personal math study OS. Track reading progress, organise topic notes, log prac
 
 ```
 lemma/
-├── books/              # Drop your PDF textbooks here (gitignored)
+├── books/              # Optional local PDF storage (gitignored)
 ├── client/             # React frontend
 │   └── src/
 │       ├── api/        # Fetch wrappers for each entity
@@ -101,17 +101,28 @@ cd client && npm run dev
 
 Open `http://localhost:5173`.
 
-Set `SEED_USER_ID` in `server/.env` to your Supabase Auth user UUID if you want seeded records to appear in your account.
+Set `SEED_USER_IDS` in `server/.env` to seed one or more Supabase Auth user UUIDs in one run (comma-separated).
+If `SEED_USER_IDS` is empty, seed falls back to `SEED_USER_ID`.
+
+### Hosted PDFs (optional)
+
+You can host book PDFs in Supabase Storage (or any public object storage) instead of storing files in `books/`.
+
+1. Set `VITE_PDF_BASE_URL` in `client/.env` to your bucket's public base URL.
+2. For non-Supabase storage, add its origin to `CSP_EXTRA_CONNECT_SRC` in `server/.env`.
+3. In Library, set each book's `PDF Filename or URL` to either:
+   - a filename like `BookOfProof.pdf` (resolved against `VITE_PDF_BASE_URL`), or
+   - a full URL like `https://<project-ref>.supabase.co/storage/v1/object/public/books/BookOfProof.pdf`.
 
 ### Demo mode (optional)
 
 If you want a one-click "Continue in demo mode" button on the auth page:
 
 1. Create a Supabase Auth user for demo access (email/password).
-2. Set `SEED_USER_ID` in `server/.env` to that demo user's UUID.
-3. Set `READ_ONLY_USER_IDS` in `server/.env` to that same UUID (or a comma-separated list).
+2. Set `SEED_USER_IDS` in `server/.env` to include both demo and your own UUID (comma-separated).
+3. Set `READ_ONLY_USER_IDS` in `server/.env` to include the demo UUID (so demo is read-only while your account remains writable).
 4. Set `VITE_DEMO_EMAIL` and `VITE_DEMO_PASSWORD` in `client/.env` to the same demo credentials.
-5. Run `make seed` so seeded data belongs to the demo account.
+5. Run `make seed` so seeded data is refreshed for the configured seed users.
 
 Demo users can browse data but cannot add/edit/delete through the API when `READ_ONLY_USER_IDS` is configured.
 

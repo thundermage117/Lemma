@@ -12,6 +12,7 @@ Lemma is a personal learning tracker with a React frontend, Express/Node.js back
 | Database | PostgreSQL (Supabase)             |
 | Auth     | Supabase Auth (JWT)               |
 | Hosting  | Render (API), static or local (client) |
+| PDFs     | Supabase Storage or other object storage (optional), with local `/books` fallback |
 
 ## Request Flow
 
@@ -50,6 +51,13 @@ make dev-client   # Vite on :5173, proxies API to :3001
 
 The local server uses the same Supabase database as production. There is no local database.
 
+## PDF Delivery
+
+- Reader accepts either full PDF URLs or local filenames from the `Book.pdfFilename` field.
+- If `VITE_PDF_BASE_URL` is configured, filenames resolve against that base URL.
+- If not configured, filenames resolve to local server static files under `/books`.
+- For non-Supabase storage hosts, set `CSP_EXTRA_CONNECT_SRC` to include the storage origin.
+
 ## Architecture Decisions
 
 See [decisions/](decisions/) for ADRs:
@@ -61,3 +69,4 @@ See [decisions/](decisions/) for ADRs:
 - [005 - API security middleware hardening](decisions/005-api-security-middleware-hardening.md)
 - [006 - Supabase Auth and user-scoped data access](decisions/006-supabase-auth-and-user-scoped-data.md)
 - [007 - User ownership migration strategy](decisions/007-user-ownership-migration-strategy.md)
+- [008 - External object storage for book PDF hosting](decisions/008-cloudflare-r2-book-pdf-hosting.md)
