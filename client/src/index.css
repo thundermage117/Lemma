@@ -280,3 +280,421 @@
     --tw-ring-color: rgb(var(--accent-orange-ring));
   }
 }
+
+/* ── Reader ──────────────────────────────────────────────────────────────────── */
+
+.reader-root {
+  height: 100vh;
+  background-color: rgb(var(--bg-canvas));
+}
+
+/* PDF toolbar — three-column so center stays truly centered */
+.reader-pdf-toolbar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 8px;
+}
+
+.reader-pdf-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.reader-pdf-toolbar__center {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.reader-pdf-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.reader-pdf-toolbar__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(var(--text-soft));
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.reader-pdf-toolbar__back:hover {
+  background-color: rgb(var(--bg-hover));
+  color: rgb(var(--brand-600));
+}
+
+.reader-pdf-toolbar__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--text-strong));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  letter-spacing: -0.01em;
+}
+
+.reader-pdf-toolbar__sep {
+  width: 1px;
+  height: 18px;
+  background-color: rgb(var(--border-main));
+  flex-shrink: 0;
+  margin: 0 6px;
+}
+
+.reader-pdf-toolbar__page-sep {
+  color: rgb(var(--text-muted));
+  font-size: 13px;
+  padding: 0 2px;
+  user-select: none;
+}
+
+/* ── rpv toolbar polish ────────────────────────────────────────────────────── */
+
+/* Font — use app's Inter throughout rpv */
+.rpv-core__minimal-button,
+.rpv-core__button,
+.rpv-core__textbox,
+.rpv-core__menu-item-label,
+.rpv-core__tooltip-body-content {
+  font-family: inherit !important;
+}
+
+/* Remove default outer container border */
+.rpv-default-layout__container {
+  border: none !important;
+}
+
+/* Toolbar surface */
+.rpv-default-layout__toolbar {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-bottom: 1px solid rgb(var(--border-main)) !important;
+}
+
+/* Scroll canvas — light grey so white pages visually pop */
+.rpv-default-layout__body {
+  background-color: rgb(var(--bg-canvas)) !important;
+}
+
+/* Sidebar */
+.rpv-default-layout__sidebar {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-right: 1px solid rgb(var(--border-main)) !important;
+}
+
+.rpv-default-layout__sidebar-headers {
+  background-color: rgb(var(--bg-subtle)) !important;
+  border-right: 1px solid rgb(var(--border-main)) !important;
+}
+
+.rpv-default-layout__sidebar-content--opened {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-strong)) !important;
+}
+
+
+/* Tighten item wrappers */
+.rpv-toolbar__item {
+  padding: 0 1px !important;
+}
+
+/* Icons — thicker stroke looks modern, not cheap */
+.rpv-core__icon {
+  stroke-width: 1.5 !important;
+}
+
+/* Primary button (has opaque grey bg by default — reset it) */
+.rpv-core__button {
+  background-color: transparent !important;
+  border-radius: 6px !important;
+  height: 30px !important;
+  padding: 0 8px !important;
+  color: rgb(var(--text-soft)) !important;
+  font-size: 13px !important;
+  transition: background-color 0.15s, color 0.15s !important;
+}
+
+.rpv-core__button:hover:not(:disabled) {
+  background-color: rgb(var(--bg-hover)) !important;
+  color: rgb(var(--text-strong)) !important;
+}
+
+/* Minimal button — main icon-button style */
+.rpv-core__minimal-button {
+  background-color: transparent !important;
+  border-radius: 6px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  padding: 0 6px !important;
+  color: rgb(var(--text-soft)) !important;
+  transition: background-color 0.15s, color 0.15s !important;
+}
+
+.rpv-core__minimal-button:hover:not(:disabled) {
+  background-color: rgb(var(--bg-hover)) !important;
+  color: rgb(var(--text-strong)) !important;
+}
+
+.rpv-core__minimal-button:disabled {
+  color: rgb(var(--text-muted)) !important;
+  opacity: 0.5 !important;
+}
+
+/* Page number input */
+.rpv-core__textbox {
+  background-color: rgb(var(--bg-canvas)) !important;
+  border: 1px solid rgb(var(--border-main)) !important;
+  border-radius: 6px !important;
+  color: rgb(var(--text-strong)) !important;
+  font-size: 13px !important;
+  height: 28px !important;
+  width: 44px !important;
+  padding: 0 4px !important;
+  text-align: center !important;
+  transition: border-color 0.15s, box-shadow 0.15s !important;
+}
+
+.rpv-core__textbox:focus {
+  border-color: rgb(var(--brand-600)) !important;
+  box-shadow: 0 0 0 2px rgb(var(--brand-ring)) !important;
+  outline: none !important;
+}
+
+/* Popovers & tooltips */
+.rpv-core__tooltip-body {
+  font-size: 12px !important;
+  border-radius: 6px !important;
+}
+
+.rpv-core__popover-body {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px 0 rgb(0 0 0 / 0.12), 0 1px 4px 0 rgb(0 0 0 / 0.08) !important;
+}
+
+.rpv-core__menu-item {
+  border-radius: 4px !important;
+  font-size: 13px !important;
+}
+
+/* Status screens (loading / error / no-pdf) */
+.reader-status-screen {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(var(--bg-canvas));
+  transition: background-color 0.2s;
+}
+
+.reader-status-screen__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.reader-status-screen__text {
+  font-size: 14px;
+  color: rgb(var(--text-soft));
+  animation: reader-fade-in 0.4s ease-out;
+}
+
+/* Spinner */
+.reader-spinner {
+  width: 34px;
+  height: 34px;
+  border: 2.5px solid rgb(var(--border-main));
+  border-top-color: rgb(var(--brand-600));
+  border-radius: 50%;
+  animation: reader-spin 0.75s linear infinite;
+}
+
+@keyframes reader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes reader-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Status cards */
+.reader-status-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 36px 48px;
+  border-radius: 16px;
+  border: 1px solid;
+  text-align: center;
+  animation: reader-fade-in 0.3s ease-out;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+}
+
+.reader-status-card--error {
+  background-color: rgb(var(--danger-bg));
+  border-color: rgb(var(--danger-border));
+}
+
+.reader-status-card--info {
+  background-color: rgb(var(--bg-panel));
+  border-color: rgb(var(--border-main));
+}
+
+.reader-status-card__icon {
+  margin-bottom: 6px;
+}
+
+.reader-status-card__icon--error {
+  color: rgb(var(--danger-text));
+}
+
+.reader-status-card__icon--info {
+  color: rgb(var(--text-soft));
+}
+
+.reader-status-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--text-strong));
+}
+
+.reader-status-card__subtitle {
+  font-size: 13px;
+  color: rgb(var(--text-soft));
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.reader-status-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(var(--brand-600));
+  text-decoration: none;
+  margin-top: 6px;
+  padding: 5px 14px;
+  border-radius: 6px;
+  background-color: rgb(var(--brand-50));
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.reader-status-card__link:hover {
+  background-color: rgb(var(--brand-ring));
+  color: rgb(var(--brand-800));
+}
+
+/* ── react-pdf-viewer dark mode overrides ────────────────────────────────────── */
+
+.dark .rpv-core__viewer {
+  background-color: rgb(var(--bg-canvas));
+}
+
+.dark .rpv-default-layout__container {
+  border-color: rgb(var(--border-main));
+}
+
+.dark .rpv-default-layout__toolbar {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-color: rgb(var(--border-main)) !important;
+}
+
+.dark .rpv-default-layout__sidebar--opened {
+  background-color: rgb(var(--bg-panel));
+  border-color: rgb(var(--border-main));
+}
+
+.dark .rpv-default-layout__body {
+  background-color: rgb(var(--bg-canvas)) !important;
+}
+
+.dark .rpv-default-layout__sidebar-headers {
+  background-color: rgb(var(--bg-subtle)) !important;
+  border-color: rgb(var(--border-main)) !important;
+}
+
+.dark .rpv-default-layout__sidebar-content--opened {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-core__text-layer {
+  color: transparent;
+}
+
+.dark .rpv-core__inner-page {
+  background-color: rgb(var(--bg-canvas));
+}
+
+
+.dark .rpv-core__button,
+.dark .rpv-core__minimal-button {
+  color: rgb(var(--text-soft)) !important;
+}
+
+.dark .rpv-core__button:hover:not(:disabled),
+.dark .rpv-core__minimal-button:hover:not(:disabled) {
+  background-color: rgb(var(--bg-hover)) !important;
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-core__minimal-button:disabled {
+  color: rgb(var(--text-muted)) !important;
+}
+
+.dark .rpv-core__textbox {
+  background-color: rgb(var(--bg-subtle)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-core__textbox:focus {
+  border-color: rgb(var(--brand-600)) !important;
+}
+
+.dark .rpv-core__tooltip-body {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-core__popover-body {
+  background-color: rgb(var(--bg-panel)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-core__menu-item:hover {
+  background-color: rgb(var(--bg-hover)) !important;
+}
+
+.dark .rpv-core__menu-item-label {
+  color: rgb(var(--text-main)) !important;
+}
+
+.dark .rpv-search__popover-input-counter {
+  background-color: rgb(var(--bg-subtle)) !important;
+  border-color: rgb(var(--border-main)) !important;
+  color: rgb(var(--text-main)) !important;
+}

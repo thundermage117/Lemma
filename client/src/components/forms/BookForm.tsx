@@ -52,7 +52,12 @@ export function BookForm({ initialValues, onSubmit, onCancel }: BookFormProps) {
       <Input label="Author" required value={form.author} onChange={(e) => set('author', e.target.value)} />
       <Input label="Subject" required placeholder="e.g. Real Analysis" value={form.subject} onChange={(e) => set('subject', e.target.value)} />
       <Textarea label="Description" rows={2} value={form.description ?? ''} onChange={(e) => set('description', e.target.value)} />
-      <Input label="PDF Filename" placeholder="e.g. abbott.pdf" value={form.pdfFilename ?? ''} onChange={(e) => set('pdfFilename', e.target.value)} />
+      <Input
+        label="PDF Filename or URL"
+        placeholder="e.g. abbott.pdf or https://<project-ref>.supabase.co/storage/v1/object/public/books/abbott.pdf"
+        value={form.pdfFilename ?? ''}
+        onChange={(e) => set('pdfFilename', e.target.value)}
+      />
       <div className="grid grid-cols-2 gap-3">
         <Input label="Total Pages" type="number" min={0} value={form.totalPages ?? ''} onChange={(e) => set('totalPages', e.target.value ? Number(e.target.value) : undefined)} />
         <Input label="Current Page" type="number" min={0} value={form.currentPage} onChange={(e) => set('currentPage', Number(e.target.value))} />
