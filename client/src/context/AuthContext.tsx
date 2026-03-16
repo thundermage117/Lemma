@@ -8,7 +8,9 @@ interface AuthContextValue {
   session: Session | null
   user: User | null
   loading: boolean
+  canUseDemoMode: boolean
   signInWithPassword: (email: string, password: string) => Promise<void>
+  signInAsDemo: () => Promise<void>
   signUpWithPassword: (email: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>
   signOut: () => Promise<void>
   authMode: AuthMode
@@ -21,6 +23,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [authMode, setAuthMode] = useState<AuthMode>('sign-in')
+  const demoEmail = import.meta.env.VITE_DEMO_EMAIL?.trim() ?? ''
+  const demoPassword = import.meta.env.VITE_DEMO_PASSWORD ?? ''
+  const canUseDemoMode = demoEmail.length > 0 && demoPassword.length > 0
 
   useEffect(() => {
     let mounted = true
@@ -55,8 +60,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       user: session?.user ?? null,
       loading,
+      canUseDemoMode,
       signInWithPassword: async (email, password) => {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+      },
+      signInAsDemo: async () => {
+        if (!canUseDemoMode) {
+          throw new Error('Demo mode is not configured for this environment')
+        }
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email: demoEmail,
+          password: demoPassword,
+        })
         if (error) throw error
       },
       signUpWithPassword: async (email, password) => {
@@ -72,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       authMode,
       setAuthMode,
     }),
-    [authMode, loading, session]
+    [authMode, canUseDemoMode, demoEmail, demoPassword, loading, session]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

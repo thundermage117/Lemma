@@ -2,6 +2,13 @@ import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { RequestHandler } from 'express'
 
 const supabaseUrl = process.env.SUPABASE_URL?.trim()
+const readOnlyUserIds = new Set(
+  (process.env.READ_ONLY_USER_IDS ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+)
+const readOnlyMethods = new Set(['GET', 'HEAD', 'OPTIONS'])
 
 if (!supabaseUrl) {
   throw new Error('SUPABASE_URL is required to verify Supabase JWTs')
@@ -48,4 +55,20 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
   } catch {
     res.status(401).json({ error: 'Invalid or expired access token' })
   }
+}
+
+export const rejectReadOnlyWrites: RequestHandler = (req, res, next) => {
+  const userId = res.locals.userId as string | undefined
+
+  if (!userId || readOnlyMethods.has(req.method)) {
+    next()
+    return
+  }
+
+  if (readOnlyUserIds.has(userId)) {
+    res.status(403).json({ error: 'Demo account is read-only' })
+    return
+  }
+
+  next()
 }

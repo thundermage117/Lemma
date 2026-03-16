@@ -66,6 +66,8 @@ Set these in `server/.env` for production.
 - Client login/signup uses Supabase Auth email+password.
 - Every `/api/*` request requires `Authorization: Bearer <access_token>`.
 - Server verifies JWTs against Supabase JWKS and scopes all reads/writes by `userId`.
+- Optional demo mode can auto-sign users into a shared demo account (no signup).
+- Demo accounts can be marked read-only (`READ_ONLY_USER_IDS`) to block create/update/delete.
 
 ## 🚀 Getting Started
 
@@ -99,6 +101,18 @@ cd client && npm run dev
 Open `http://localhost:5173`.
 
 Set `SEED_USER_ID` in `server/.env` to your Supabase Auth user UUID if you want seeded records to appear in your account.
+
+### Demo mode (optional)
+
+If you want a one-click "Continue in demo mode" button on the auth page:
+
+1. Create a Supabase Auth user for demo access (email/password).
+2. Set `SEED_USER_ID` in `server/.env` to that demo user's UUID.
+3. Set `READ_ONLY_USER_IDS` in `server/.env` to that same UUID (or a comma-separated list).
+4. Set `VITE_DEMO_EMAIL` and `VITE_DEMO_PASSWORD` in `client/.env` to the same demo credentials.
+5. Run `make seed` so seeded data belongs to the demo account.
+
+Demo users can browse data but cannot add/edit/delete through the API when `READ_ONLY_USER_IDS` is configured.
 
 ### Reset and re-seed
 

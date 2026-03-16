@@ -4,11 +4,13 @@ import { Input } from '../components/ui/Input'
 import { useAuth } from '../hooks/useAuth'
 
 export function AuthPage() {
-  const { authMode, setAuthMode, signInWithPassword, signUpWithPassword } = useAuth()
+  const { authMode, setAuthMode, canUseDemoMode, signInWithPassword, signInAsDemo, signUpWithPassword } =
+    useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [demoLoading, setDemoLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
@@ -71,6 +73,21 @@ export function AuthPage() {
     setAuthMode(isSignUp ? 'sign-in' : 'sign-up')
   }
 
+  const handleDemoMode = async () => {
+    setError(null)
+    setNotice(null)
+    setDemoLoading(true)
+
+    try {
+      await signInAsDemo()
+      setNotice('Entered demo mode with seeded sample data.')
+    } catch (submitError) {
+      setError((submitError as Error).message)
+    } finally {
+      setDemoLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -124,9 +141,26 @@ export function AuthPage() {
             </p>
           ) : null}
 
-          <Button type="submit" loading={loading} className="w-full justify-center">
+          <Button type="submit" loading={loading} disabled={demoLoading} className="w-full justify-center">
             {modeCopy.primaryLabel}
           </Button>
+          {canUseDemoMode ? (
+            <>
+              <Button
+                type="button"
+                variant="secondary"
+                loading={demoLoading}
+                disabled={loading}
+                onClick={handleDemoMode}
+                className="w-full justify-center"
+              >
+                Continue in demo mode
+              </Button>
+              <p className="text-xs text-slate-500">
+                Try Lemma instantly with sample data. No signup needed.
+              </p>
+            </>
+          ) : null}
         </form>
 
         <div className="mt-4 text-sm text-slate-500 text-center">
