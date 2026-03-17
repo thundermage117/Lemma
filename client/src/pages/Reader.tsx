@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Viewer, Worker, SpecialZoomLevel } from '@react-pdf-viewer/core'
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
@@ -38,6 +39,124 @@ const resolvePdfUrl = (pdfRef: string) => {
   }
 
   return `/books/${encodePathSegments(normalized)}`
+}
+
+const zoomLevels = [50, 75, 100, 125, 150, 175, 200]
+
+function ToolbarIconButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string
+  onClick: () => void
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      className="reader-icon-button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  )
+}
+
+function ToolbarIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg className="reader-toolbar-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      {children}
+    </svg>
+  )
+}
+
+function SearchIcon() {
+  return (
+    <ToolbarIcon>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-4.2-4.2" />
+    </ToolbarIcon>
+  )
+}
+
+function ZoomOutIcon() {
+  return (
+    <ToolbarIcon>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M8 11h6" />
+      <path d="M20 20l-4.2-4.2" />
+    </ToolbarIcon>
+  )
+}
+
+function ZoomInIcon() {
+  return (
+    <ToolbarIcon>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M8 11h6" />
+      <path d="M11 8v6" />
+      <path d="M20 20l-4.2-4.2" />
+    </ToolbarIcon>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <ToolbarIcon>
+      <path d="M12 4v10" />
+      <path d="M8 10l4 4 4-4" />
+      <path d="M5 19h14" />
+    </ToolbarIcon>
+  )
+}
+
+function PrintIcon() {
+  return (
+    <ToolbarIcon>
+      <rect x="7.5" y="4" width="9" height="4.5" rx="0.8" />
+      <rect x="5" y="9" width="14" height="6.5" rx="1.4" />
+      <path d="M7.5 13.5h9" />
+      <path d="M7.5 16v4h9v-4" />
+    </ToolbarIcon>
+  )
+}
+
+function FullscreenIcon() {
+  return (
+    <ToolbarIcon>
+      <path d="M8 4H4v4" />
+      <path d="M16 4h4v4" />
+      <path d="M20 16v4h-4" />
+      <path d="M4 16v4h4" />
+    </ToolbarIcon>
+  )
+}
+
+function FitWidthIcon() {
+  return (
+    <ToolbarIcon>
+      <rect x="6.2" y="7.3" width="11.6" height="9.4" rx="1.1" />
+      <path d="M3.6 9.1h2.2" />
+      <path d="M18.2 9.1h2.2" />
+      <path d="M3.6 14.9h2.2" />
+      <path d="M18.2 14.9h2.2" />
+    </ToolbarIcon>
+  )
+}
+
+function FitPageIcon() {
+  return (
+    <ToolbarIcon>
+      <rect x="7.2" y="4.4" width="9.6" height="15.2" rx="1.1" />
+      <path d="M9.1 6.3h5.8" />
+      <path d="M9.1 17.7h5.8" />
+      <path d="M12 6.3v-2" />
+      <path d="M12 17.7v2" />
+    </ToolbarIcon>
+  )
 }
 
 function useIsDark() {
@@ -81,6 +200,7 @@ export function Reader() {
   const [book, setBook] = useState<Book | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [fitMode, setFitMode] = useState<'page' | 'width' | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isDark = useIsDark()
   const isMobile = useIsMobile()
@@ -103,6 +223,22 @@ export function Reader() {
     }, 1000)
   }
 
+  const renderFitOptions = (onZoom: (newScale: number | SpecialZoomLevel) => void) => (
+    <button
+      type="button"
+      className={`reader-fit-button ${fitMode ? 'reader-fit-button--active' : ''}`}
+      aria-label={fitMode === 'width' ? 'Switch to fit page' : 'Switch to fit width'}
+      title={fitMode === 'width' ? 'Fit width (click for fit page)' : 'Fit page (click for fit width)'}
+      onClick={() => {
+        const nextFitMode = fitMode === 'width' ? 'page' : 'width'
+        setFitMode(nextFitMode)
+        onZoom(nextFitMode === 'width' ? SpecialZoomLevel.PageWidth : SpecialZoomLevel.PageFit)
+      }}
+    >
+      {fitMode === 'width' ? <FitWidthIcon /> : <FitPageIcon />}
+    </button>
+  )
+
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: (defaultTabs) => (isMobile ? [] : defaultTabs),
     renderToolbar: (Toolbar) => (
@@ -110,7 +246,7 @@ export function Reader() {
         {(slots) => {
           const {
             ZoomOut, Zoom, ZoomIn,
-            GoToPreviousPage, CurrentPageInput, GoToNextPage, NumberOfPages,
+            CurrentPageInput, NumberOfPages,
             Print, Download, EnterFullScreen, ShowSearchPopover,
           } = slots
 
@@ -123,17 +259,80 @@ export function Reader() {
                   </svg>
                 </Link>
 
-                <GoToPreviousPage />
                 <CurrentPageInput />
                 <span className="reader-pdf-toolbar__page-sep">/</span>
-                <NumberOfPages />
-                <GoToNextPage />
+                <span className="reader-pdf-toolbar__page-total">
+                  <NumberOfPages />
+                </span>
                 <div className="reader-pdf-toolbar__sep" />
-                <ZoomOut />
-                <Zoom />
-                <ZoomIn />
-                <ShowSearchPopover />
-                <Download />
+                <ZoomOut>
+                  {({ onClick }) => (
+                    <ToolbarIconButton
+                      label="Zoom out"
+                      onClick={() => {
+                        setFitMode(null)
+                        onClick()
+                      }}
+                    >
+                      <ZoomOutIcon />
+                    </ToolbarIconButton>
+                  )}
+                </ZoomOut>
+                <Zoom>
+                  {({ scale, onZoom }) => {
+                    const currentZoom = Math.round(scale * 100)
+                    const levels = zoomLevels.includes(currentZoom)
+                      ? zoomLevels
+                      : [...zoomLevels, currentZoom].sort((a, b) => a - b)
+                    return (
+                      <span className="reader-zoom-select-wrap">
+                        <select
+                          className="reader-zoom-select"
+                          aria-label="Zoom level"
+                          value={currentZoom}
+                          onChange={(event) => {
+                            setFitMode(null)
+                            onZoom(Number(event.target.value) / 100)
+                          }}
+                        >
+                          {levels.map((level) => (
+                            <option key={level} value={level}>
+                              {level}%
+                            </option>
+                          ))}
+                        </select>
+                      </span>
+                    )
+                  }}
+                </Zoom>
+                <ZoomIn>
+                  {({ onClick }) => (
+                    <ToolbarIconButton
+                      label="Zoom in"
+                      onClick={() => {
+                        setFitMode(null)
+                        onClick()
+                      }}
+                    >
+                      <ZoomInIcon />
+                    </ToolbarIconButton>
+                  )}
+                </ZoomIn>
+                <Zoom>{({ onZoom }) => renderFitOptions(onZoom)}</Zoom>
+                <ShowSearchPopover>
+                  {({ onClick }) => (
+                    <ToolbarIconButton label="Search" onClick={onClick}>
+                      <SearchIcon />
+                    </ToolbarIconButton>
+                  )}
+                </ShowSearchPopover>
+                <Download>
+                  {({ onClick }) => (
+                    <ToolbarIconButton label="Download" onClick={onClick}>
+                      <DownloadIcon />
+                    </ToolbarIconButton>
+                  )}
+                </Download>
               </div>
             )
           }
@@ -154,21 +353,108 @@ export function Reader() {
               </div>
 
               <div className="reader-pdf-toolbar__center">
-                <ShowSearchPopover />
-                <div className="reader-pdf-toolbar__sep" />
-                <ZoomOut /><Zoom /><ZoomIn />
-                <div className="reader-pdf-toolbar__sep" />
-                <GoToPreviousPage />
-                <CurrentPageInput />
-                <span className="reader-pdf-toolbar__page-sep">/</span>
-                <NumberOfPages />
-                <GoToNextPage />
+                <div className="reader-pdf-toolbar__group">
+                  <ShowSearchPopover>
+                    {({ onClick }) => (
+                      <ToolbarIconButton label="Search" onClick={onClick}>
+                        <SearchIcon />
+                      </ToolbarIconButton>
+                    )}
+                  </ShowSearchPopover>
+                </div>
+                <div className="reader-pdf-toolbar__group">
+                  <ZoomOut>
+                    {({ onClick }) => (
+                      <ToolbarIconButton
+                        label="Zoom out"
+                        onClick={() => {
+                          setFitMode(null)
+                          onClick()
+                        }}
+                      >
+                        <ZoomOutIcon />
+                      </ToolbarIconButton>
+                    )}
+                  </ZoomOut>
+                  <Zoom>
+                    {({ scale, onZoom }) => {
+                      const currentZoom = Math.round(scale * 100)
+                      const levels = zoomLevels.includes(currentZoom)
+                        ? zoomLevels
+                        : [...zoomLevels, currentZoom].sort((a, b) => a - b)
+                      return (
+                        <span className="reader-zoom-select-wrap">
+                          <select
+                            className="reader-zoom-select"
+                            aria-label="Zoom level"
+                            value={currentZoom}
+                            onChange={(event) => {
+                              setFitMode(null)
+                              onZoom(Number(event.target.value) / 100)
+                            }}
+                          >
+                            {levels.map((level) => (
+                              <option key={level} value={level}>
+                                {level}%
+                              </option>
+                            ))}
+                          </select>
+                        </span>
+                      )
+                    }}
+                  </Zoom>
+                  <ZoomIn>
+                    {({ onClick }) => (
+                      <ToolbarIconButton
+                        label="Zoom in"
+                        onClick={() => {
+                          setFitMode(null)
+                          onClick()
+                        }}
+                      >
+                        <ZoomInIcon />
+                      </ToolbarIconButton>
+                    )}
+                  </ZoomIn>
+                  <Zoom>{({ onZoom }) => renderFitOptions(onZoom)}</Zoom>
+                </div>
+                <div className="reader-pdf-toolbar__group reader-pdf-toolbar__group--page">
+                  <CurrentPageInput />
+                  <span className="reader-pdf-toolbar__page-sep">/</span>
+                  <span className="reader-pdf-toolbar__page-total">
+                    <NumberOfPages />
+                  </span>
+                </div>
               </div>
 
               <div className="reader-pdf-toolbar__right">
-                {!isMobile && <Print />}
-                <Download />
-                {!isMobile && <EnterFullScreen />}
+                <div className="reader-pdf-toolbar__group">
+                  {!isMobile && (
+                    <Print>
+                      {({ onClick }) => (
+                        <ToolbarIconButton label="Print" onClick={onClick}>
+                          <PrintIcon />
+                        </ToolbarIconButton>
+                      )}
+                    </Print>
+                  )}
+                  <Download>
+                    {({ onClick }) => (
+                      <ToolbarIconButton label="Download" onClick={onClick}>
+                        <DownloadIcon />
+                      </ToolbarIconButton>
+                    )}
+                  </Download>
+                  {!isMobile && (
+                    <EnterFullScreen>
+                      {({ onClick }) => (
+                        <ToolbarIconButton label="Fullscreen" onClick={onClick}>
+                          <FullscreenIcon />
+                        </ToolbarIconButton>
+                      )}
+                    </EnterFullScreen>
+                  )}
+                </div>
               </div>
             </div>
           )
