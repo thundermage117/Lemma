@@ -287,10 +287,49 @@
   min-height: 100vh;
   height: 100dvh;
   background-color: rgb(var(--bg-canvas));
+  display: flex;
+  flex-direction: column;
 }
 
 .reader-root--mobile {
-  padding-top: env(safe-area-inset-top);
+  padding-top: 0;
+}
+
+.reader-viewer-shell {
+  flex: 1;
+  min-height: 0;
+}
+
+.reader-viewer-shell .rpv-core__viewer {
+  height: 100%;
+}
+
+.reader-mobile-topbar {
+  display: none;
+}
+
+.reader-mobile-topbar__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 72px;
+  color: rgb(var(--text-main));
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reader-mobile-topbar__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(var(--text-strong));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reader-mobile-topbar__spacer {
+  min-width: 72px;
 }
 
 /* PDF toolbar — three-column so center stays truly centered */
@@ -824,6 +863,24 @@
 }
 
 @media (max-width: 768px) {
+  .reader-mobile-topbar {
+    display: grid;
+    grid-template-columns: minmax(72px, auto) 1fr minmax(72px, auto);
+    align-items: center;
+    gap: 8px;
+    padding: calc(env(safe-area-inset-top) + 8px) 10px 8px;
+    background: rgb(var(--bg-panel) / 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgb(var(--border-main));
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+
+  .reader-mobile-topbar__spacer {
+    min-width: 0;
+  }
+
   .rpv-default-layout__toolbar {
     height: auto !important;
     min-height: 0 !important;

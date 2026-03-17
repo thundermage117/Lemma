@@ -253,12 +253,6 @@ export function Reader() {
           if (isMobile) {
             return (
               <div className="reader-pdf-toolbar reader-pdf-toolbar--mobile">
-                <Link to="/library" className="reader-pdf-toolbar__back" aria-label="Back to library">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-
                 <CurrentPageInput />
                 <span className="reader-pdf-toolbar__page-sep">/</span>
                 <span className="reader-pdf-toolbar__page-total">
@@ -555,16 +549,33 @@ export function Reader() {
 
   return (
     <div className={`reader-root ${isDark ? 'dark' : ''} ${isMobile ? 'reader-root--mobile' : ''}`}>
-      <Worker workerUrl={workerUrl}>
-        <Viewer
-          fileUrl={fileUrl}
-          initialPage={book.currentPage > 0 ? book.currentPage - 1 : 0}
-          defaultScale={initialScale}
-          onPageChange={handlePageChange}
-          onZoom={(e) => localStorage.setItem(zoomStorageKey, String(e.scale))}
-          plugins={[defaultLayoutPluginInstance]}
-        />
-      </Worker>
+      {isMobile && (
+        <header className="reader-mobile-topbar">
+          <Link to="/library" className="reader-mobile-topbar__back" aria-label="Back to library">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+            </svg>
+            <span>Library</span>
+          </Link>
+          <span className="reader-mobile-topbar__title" title={book.title}>
+            {book.title}
+          </span>
+          <div className="reader-mobile-topbar__spacer" aria-hidden="true" />
+        </header>
+      )}
+
+      <div className="reader-viewer-shell">
+        <Worker workerUrl={workerUrl}>
+          <Viewer
+            fileUrl={fileUrl}
+            initialPage={book.currentPage > 0 ? book.currentPage - 1 : 0}
+            defaultScale={initialScale}
+            onPageChange={handlePageChange}
+            onZoom={(e) => localStorage.setItem(zoomStorageKey, String(e.scale))}
+            plugins={[defaultLayoutPluginInstance]}
+          />
+        </Worker>
+      </div>
     </div>
   )
 }
