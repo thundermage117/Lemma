@@ -65,13 +65,13 @@ export function JournalForm({ initialValues, books, topics, onSubmit, onCancel }
       <Textarea label="One Thing I Understood" rows={2}
         placeholder="One insight or breakthrough..."
         value={form.oneThingIUnderstood ?? ''} onChange={(e) => set('oneThingIUnderstood', e.target.value)} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input label="Pages Read" type="number" min={0} value={form.pagesRead ?? ''}
           onChange={(e) => set('pagesRead', e.target.value ? Number(e.target.value) : null)} />
         <Input label="Duration (min)" type="number" min={0} value={form.durationMinutes ?? ''}
           onChange={(e) => set('durationMinutes', e.target.value ? Number(e.target.value) : null)} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select label="Linked Book" value={form.linkedBookId ? String(form.linkedBookId) : ''}
           options={bookOptions}
           onChange={(e) => set('linkedBookId', e.target.value ? Number(e.target.value) : null)} />
@@ -79,9 +79,9 @@ export function JournalForm({ initialValues, books, topics, onSubmit, onCancel }
           options={topicOptions}
           onChange={(e) => set('linkedTopicId', e.target.value ? Number(e.target.value) : null)} />
       </div>
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>{initialValues ? 'Save Changes' : 'Save Entry'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto justify-center">Cancel</Button>
+        <Button type="submit" loading={loading} className="w-full sm:w-auto justify-center">{initialValues ? 'Save Changes' : 'Save Entry'}</Button>
       </div>
     </form>
   )

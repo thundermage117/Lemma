@@ -56,7 +56,13 @@ const nav = [
   },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  isMobile?: boolean
+  onNavigate?: () => void
+  onClose?: () => void
+}
+
+export function Sidebar({ isMobile = false, onNavigate, onClose }: SidebarProps) {
   const { theme, toggleTheme } = useTheme()
   const { user, signOut } = useAuth()
   const [isSigningOut, setIsSigningOut] = useState(false)
@@ -72,15 +78,33 @@ export function Sidebar() {
     }
   }
 
+  const asideClass = isMobile
+    ? 'w-72 max-w-[85vw] shrink-0 bg-white border-r border-slate-200 flex flex-col h-full'
+    : 'hidden lg:flex w-56 shrink-0 bg-white border-r border-slate-200 flex-col h-screen sticky top-0'
+
   return (
-    <aside className="w-56 shrink-0 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0">
+    <aside className={asideClass}>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-slate-200">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
-            <span className="text-white text-sm font-bold">λ</span>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold">λ</span>
+            </div>
+            <span className="text-slate-900 font-semibold text-base tracking-tight">Lemma</span>
           </div>
-          <span className="text-slate-900 font-semibold text-base tracking-tight">Lemma</span>
+          {isMobile && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              aria-label="Close navigation menu"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
         </div>
         <p className="text-xs text-slate-400 mt-1 pl-9">Math Study OS</p>
       </div>
@@ -99,6 +123,7 @@ export function Sidebar() {
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               }`
             }
+            onClick={onNavigate}
           >
             {icon}
             {label}

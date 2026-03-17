@@ -36,21 +36,21 @@ export function Topics() {
 
   const filtered = filterStatus ? topics.filter((t) => t.status === filterStatus) : topics
 
-  if (loading) return <div className="p-8 text-slate-400 text-sm">Loading...</div>
-  if (error) return <div className="p-8 text-red-500 text-sm">Error: {error}</div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8 text-slate-400 text-sm">Loading...</div>
+  if (error) return <div className="p-4 sm:p-6 lg:p-8 text-red-500 text-sm">Error: {error}</div>
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-4 py-5 sm:px-6 sm:py-6 lg:p-8 max-w-5xl mx-auto">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Topic Notes</h1>
           <p className="text-slate-500 text-sm mt-1">{topics.length} topic{topics.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button onClick={() => setIsOpen(true)}>+ New Topic</Button>
+        <Button onClick={() => setIsOpen(true)} className="w-full sm:w-auto justify-center">+ New Topic</Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         <button
           onClick={() => setFilterStatus('')}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${!filterStatus ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
@@ -77,7 +77,7 @@ export function Topics() {
                 className="p-5 cursor-pointer"
                 onClick={() => setExpanded(expanded === topic.id ? null : topic.id)}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="font-semibold text-slate-900">{topic.title}</h2>
@@ -98,7 +98,7 @@ export function Topics() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center justify-between sm:justify-start gap-3 shrink-0">
                     <div className="text-right">
                       <p className="text-xs text-slate-400">Confidence</p>
                       <p className="text-lg font-bold text-indigo-600">{topic.confidenceLevel}<span className="text-xs text-slate-400">/10</span></p>

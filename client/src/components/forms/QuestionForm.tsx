@@ -58,7 +58,7 @@ export function QuestionForm({ initialValues, books, topics, onSubmit, onCancel 
         value={form.text} onChange={(e) => set('text', e.target.value)} />
       <Select label="Status" value={form.status} options={statusOptions}
         onChange={(e) => set('status', e.target.value)} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select label="Linked Book" value={form.linkedBookId ? String(form.linkedBookId) : ''}
           options={bookOptions}
           onChange={(e) => set('linkedBookId', e.target.value ? Number(e.target.value) : null)} />
@@ -68,9 +68,9 @@ export function QuestionForm({ initialValues, books, topics, onSubmit, onCancel 
       </div>
       <Input label="Page Number" type="number" min={1} value={form.pageNumber ?? ''}
         onChange={(e) => set('pageNumber', e.target.value ? Number(e.target.value) : null)} />
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>{initialValues ? 'Save Changes' : 'Add Question'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto justify-center">Cancel</Button>
+        <Button type="submit" loading={loading} className="w-full sm:w-auto justify-center">{initialValues ? 'Save Changes' : 'Add Question'}</Button>
       </div>
     </form>
   )

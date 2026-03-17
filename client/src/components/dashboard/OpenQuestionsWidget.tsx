@@ -63,7 +63,7 @@ export function OpenQuestionsWidget({ questions, onAdd, onResolve }: OpenQuestio
               <p className="text-sm text-slate-700 flex-1 leading-snug">{q.text}</p>
               <button
                 onClick={() => onResolve(q.id)}
-                className="text-xs text-slate-400 hover:text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
+                className="text-xs text-slate-400 hover:text-emerald-600 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0 mt-0.5"
                 title="Mark as understood"
               >
                 ✓

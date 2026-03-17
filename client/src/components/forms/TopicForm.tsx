@@ -70,15 +70,15 @@ export function TopicForm({ initialValues, books, onSubmit, onCancel }: TopicFor
       <Select label="Linked Book" value={form.linkedBookId ? String(form.linkedBookId) : ''}
         options={bookOptions}
         onChange={(e) => set('linkedBookId', e.target.value ? Number(e.target.value) : null)} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input label="Page Start" type="number" min={1} value={form.pageStart ?? ''}
           onChange={(e) => set('pageStart', e.target.value ? Number(e.target.value) : null)} />
         <Input label="Page End" type="number" min={1} value={form.pageEnd ?? ''}
           onChange={(e) => set('pageEnd', e.target.value ? Number(e.target.value) : null)} />
       </div>
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>{initialValues ? 'Save Changes' : 'Add Topic'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto justify-center">Cancel</Button>
+        <Button type="submit" loading={loading} className="w-full sm:w-auto justify-center">{initialValues ? 'Save Changes' : 'Add Topic'}</Button>
       </div>
     </form>
   )

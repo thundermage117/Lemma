@@ -41,19 +41,19 @@ export function Journal() {
     await deleteEntry(entry.id)
   }
 
-  if (loading) return <div className="p-8 text-slate-400 text-sm">Loading...</div>
-  if (error) return <div className="p-8 text-red-500 text-sm">Error: {error}</div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8 text-slate-400 text-sm">Loading...</div>
+  if (error) return <div className="p-4 sm:p-6 lg:p-8 text-red-500 text-sm">Error: {error}</div>
 
   const todayEntry = entries.find((e) => isToday(e.date))
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="px-4 py-5 sm:px-6 sm:py-6 lg:p-8 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Daily Reflection</h1>
           <p className="text-slate-500 text-sm mt-1">{entries.length} entr{entries.length !== 1 ? 'ies' : 'y'}</p>
         </div>
-        <Button onClick={() => setIsOpen(true)}>
+        <Button onClick={() => setIsOpen(true)} className="w-full sm:w-auto justify-center">
           {todayEntry ? 'New Entry' : '+ Today\'s Entry'}
         </Button>
       </div>
@@ -74,7 +74,7 @@ export function Journal() {
         <div className="space-y-4">
           {entries.map((entry) => (
             <div key={entry.id} className={`bg-white rounded-xl border p-6 ${isToday(entry.date) ? 'border-indigo-300 ring-1 ring-indigo-200' : 'border-slate-200'}`}>
-              <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
                 <div>
                   <p className="font-semibold text-slate-900">
                     {formatDate(entry.date)}
@@ -82,14 +82,14 @@ export function Journal() {
                       <span className="ml-2 text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Today</span>
                     )}
                   </p>
-                  <div className="flex gap-3 text-xs text-slate-400 mt-1">
+                  <div className="flex gap-3 text-xs text-slate-400 mt-1 flex-wrap">
                     {entry.pagesRead != null && <span>{entry.pagesRead} pages</span>}
                     {entry.durationMinutes != null && <span>{entry.durationMinutes} min</span>}
                     {entry.book && <span>{entry.book.title}</span>}
                     {entry.topic && <span>· {entry.topic.title}</span>}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex gap-2 shrink-0 flex-wrap">
                   <Button size="sm" variant="ghost" onClick={() => setEditing(entry)}>Edit</Button>
                   <Button size="sm" variant="danger" onClick={() => handleDelete(entry)}>Delete</Button>
                 </div>

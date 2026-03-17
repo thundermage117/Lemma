@@ -84,7 +84,7 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
       <Textarea label="Problem Statement" required rows={3} placeholder="Use Markdown + LaTeX, e.g. Prove $\\lim_{x\\to 0} \\frac{\\sin x}{x}=1$"
         value={form.problemStatement}
         onChange={(e) => set('problemStatement', e.target.value)} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select label="Source" value={form.sourceType} options={sourceOptions}
           onChange={(e) => set('sourceType', e.target.value)} />
         <Select label="Difficulty" value={form.difficulty} options={difficultyOptions}
@@ -92,7 +92,7 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
       </div>
       <Select label="Status" value={form.status} options={statusOptions}
         onChange={(e) => set('status', e.target.value)} />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Select label="Linked Book" value={form.linkedBookId ? String(form.linkedBookId) : ''}
           options={bookOptions}
           onChange={(e) => set('linkedBookId', e.target.value ? Number(e.target.value) : null)} />
@@ -100,7 +100,7 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
           options={topicOptions}
           onChange={(e) => set('topicId', e.target.value ? Number(e.target.value) : null)} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input label="Chapter / Section" value={form.chapterOrSection ?? ''}
           onChange={(e) => set('chapterOrSection', e.target.value)} />
         <Input label="Page Number" type="number" min={1} value={form.pageNumber ?? ''}
@@ -116,9 +116,9 @@ export function ProblemForm({ initialValues, books, topics, onSubmit, onCancel }
         onChange={(e) => set('mistakesMade', e.target.value)} />
       <Input label="Revisit Date" type="date" value={form.revisitDate ? form.revisitDate.slice(0, 10) : ''}
         onChange={(e) => set('revisitDate', e.target.value || null)} />
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>{initialValues ? 'Save Changes' : 'Add Problem'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto justify-center">Cancel</Button>
+        <Button type="submit" loading={loading} className="w-full sm:w-auto justify-center">{initialValues ? 'Save Changes' : 'Add Problem'}</Button>
       </div>
     </form>
   )

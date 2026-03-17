@@ -33,17 +33,17 @@ export function Library() {
     await updateBook(book.id, { isActive: true })
   }
 
-  if (loading) return <div className="p-8 text-slate-400 text-sm">Loading...</div>
-  if (error) return <div className="p-8 text-red-500 text-sm">Error: {error}</div>
+  if (loading) return <div className="p-4 sm:p-6 lg:p-8 text-slate-400 text-sm">Loading...</div>
+  if (error) return <div className="p-4 sm:p-6 lg:p-8 text-red-500 text-sm">Error: {error}</div>
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="px-4 py-5 sm:px-6 sm:py-6 lg:p-8 max-w-5xl mx-auto">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Library</h1>
           <p className="text-slate-500 text-sm mt-1">{books.length} book{books.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button onClick={() => setIsOpen(true)}>+ Add Book</Button>
+        <Button onClick={() => setIsOpen(true)} className="w-full sm:w-auto justify-center">+ Add Book</Button>
       </div>
 
       {books.length === 0 ? (
@@ -64,7 +64,7 @@ export function Library() {
                 key={book.id}
                 className={`bg-white rounded-xl border p-5 ${book.isActive ? 'border-indigo-300 ring-1 ring-indigo-200' : 'border-slate-200'}`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="font-semibold text-slate-900">{book.title}</h2>
@@ -84,7 +84,7 @@ export function Library() {
                     )}
                   </div>
 
-                  <div className="flex gap-2 shrink-0">
+                  <div className="flex flex-wrap gap-2 shrink-0">
                     {!book.isActive && (
                       <Button size="sm" variant="ghost" onClick={() => handleSetActive(book)}>
                         Set Active

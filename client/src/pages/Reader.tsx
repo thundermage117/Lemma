@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Viewer, Worker } from '@react-pdf-viewer/core'
+import { Viewer, Worker, SpecialZoomLevel } from '@react-pdf-viewer/core'
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
@@ -54,6 +54,28 @@ function useIsDark() {
   return isDark
 }
 
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false
+  )
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(max-width: ${breakpoint}px)`)
+    const onChange = (event: MediaQueryListEvent) => setIsMobile(event.matches)
+    setIsMobile(mediaQuery.matches)
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', onChange)
+      return () => mediaQuery.removeEventListener('change', onChange)
+    }
+
+    mediaQuery.addListener(onChange)
+    return () => mediaQuery.removeListener(onChange)
+  }, [breakpoint])
+
+  return isMobile
+}
+
 export function Reader() {
   const { bookId } = useParams<{ bookId: string }>()
   const [book, setBook] = useState<Book | null>(null)
@@ -61,6 +83,7 @@ export function Reader() {
   const [error, setError] = useState<string | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isDark = useIsDark()
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     booksApi.getById(Number(bookId))
@@ -81,6 +104,7 @@ export function Reader() {
   }
 
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
+    sidebarTabs: (defaultTabs) => (isMobile ? [] : defaultTabs),
     renderToolbar: (Toolbar) => (
       <Toolbar>
         {(slots) => {
@@ -89,6 +113,31 @@ export function Reader() {
             GoToPreviousPage, CurrentPageInput, GoToNextPage, NumberOfPages,
             Print, Download, EnterFullScreen, ShowSearchPopover,
           } = slots
+
+          if (isMobile) {
+            return (
+              <div className="reader-pdf-toolbar reader-pdf-toolbar--mobile">
+                <Link to="/library" className="reader-pdf-toolbar__back" aria-label="Back to library">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
+                  </svg>
+                </Link>
+
+                <GoToPreviousPage />
+                <CurrentPageInput />
+                <span className="reader-pdf-toolbar__page-sep">/</span>
+                <NumberOfPages />
+                <GoToNextPage />
+                <div className="reader-pdf-toolbar__sep" />
+                <ZoomOut />
+                <Zoom />
+                <ZoomIn />
+                <ShowSearchPopover />
+                <Download />
+              </div>
+            )
+          }
+
           return (
             <div className="reader-pdf-toolbar">
               <div className="reader-pdf-toolbar__left">
@@ -117,7 +166,9 @@ export function Reader() {
               </div>
 
               <div className="reader-pdf-toolbar__right">
-                <Print /><Download /><EnterFullScreen />
+                {!isMobile && <Print />}
+                <Download />
+                {!isMobile && <EnterFullScreen />}
               </div>
             </div>
           )
@@ -187,8 +238,14 @@ export function Reader() {
   }
 
   // ── PDF Viewer ─────────────────────────────────────────────────────────────
-  const savedZoom = localStorage.getItem(`zoom-${bookId}`)
-  const initialScale = savedZoom ? parseFloat(savedZoom) : undefined
+  const zoomStorageKey = `zoom-${bookId}-${isMobile ? 'mobile' : 'desktop'}`
+  const savedZoom = localStorage.getItem(zoomStorageKey)
+  const parsedZoom = savedZoom ? Number.parseFloat(savedZoom) : Number.NaN
+  const initialScale = Number.isFinite(parsedZoom)
+    ? parsedZoom
+    : isMobile
+      ? SpecialZoomLevel.PageWidth
+      : undefined
   const fileUrl = resolvePdfUrl(book.pdfFilename)
 
   if (!fileUrl) {
@@ -211,14 +268,14 @@ export function Reader() {
   }
 
   return (
-    <div className={`reader-root ${isDark ? 'dark' : ''}`}>
+    <div className={`reader-root ${isDark ? 'dark' : ''} ${isMobile ? 'reader-root--mobile' : ''}`}>
       <Worker workerUrl={workerUrl}>
         <Viewer
           fileUrl={fileUrl}
           initialPage={book.currentPage > 0 ? book.currentPage - 1 : 0}
           defaultScale={initialScale}
           onPageChange={handlePageChange}
-          onZoom={(e) => localStorage.setItem(`zoom-${bookId}`, String(e.scale))}
+          onZoom={(e) => localStorage.setItem(zoomStorageKey, String(e.scale))}
           plugins={[defaultLayoutPluginInstance]}
         />
       </Worker>

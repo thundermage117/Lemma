@@ -22,10 +22,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
   const maxW = size === 'lg' ? 'max-w-2xl' : 'max-w-lg'
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className={`relative bg-white rounded-xl shadow-xl w-full ${maxW} max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+      <div className={`relative bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full ${maxW} max-h-[95vh] sm:max-h-[90vh] flex flex-col`}>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-200">
           <h2 className="text-base font-semibold text-slate-900">{title}</h2>
           <button
             onClick={onClose}
@@ -36,7 +36,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
             </svg>
           </button>
         </div>
-        <div className="overflow-y-auto px-6 py-4 flex-1">{children}</div>
+        <div className="overflow-y-auto px-4 sm:px-6 py-4 flex-1">{children}</div>
       </div>
     </div>,
     document.body

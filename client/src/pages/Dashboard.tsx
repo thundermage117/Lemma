@@ -30,7 +30,7 @@ export function Dashboard() {
 
   if (error) {
     return (
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         <div className="rounded-lg bg-red-50 border border-red-200 p-4">
           <p className="text-sm text-red-700">Failed to load dashboard: {error}</p>
           <p className="text-xs text-red-500 mt-1">Make sure the server is running on port 3001.</p>
@@ -42,7 +42,7 @@ export function Dashboard() {
   if (!summary) return null
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="px-4 py-5 sm:px-6 sm:py-6 lg:p-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Today's Study</h1>

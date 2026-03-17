@@ -58,7 +58,7 @@ export function BookForm({ initialValues, onSubmit, onCancel }: BookFormProps) {
         value={form.pdfFilename ?? ''}
         onChange={(e) => set('pdfFilename', e.target.value)}
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input label="Total Pages" type="number" min={0} value={form.totalPages ?? ''} onChange={(e) => set('totalPages', e.target.value ? Number(e.target.value) : undefined)} />
         <Input label="Current Page" type="number" min={0} value={form.currentPage} onChange={(e) => set('currentPage', Number(e.target.value))} />
       </div>
@@ -68,9 +68,9 @@ export function BookForm({ initialValues, onSubmit, onCancel }: BookFormProps) {
         <input type="checkbox" checked={form.isActive} onChange={(e) => set('isActive', e.target.checked)} className="rounded border-slate-300 text-indigo-600" />
         Set as current book
       </label>
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" loading={loading}>{initialValues ? 'Save Changes' : 'Add Book'}</Button>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+        <Button type="button" variant="secondary" onClick={onCancel} className="w-full sm:w-auto justify-center">Cancel</Button>
+        <Button type="submit" loading={loading} className="w-full sm:w-auto justify-center">{initialValues ? 'Save Changes' : 'Add Book'}</Button>
       </div>
     </form>
   )

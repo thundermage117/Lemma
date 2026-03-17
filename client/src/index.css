@@ -284,8 +284,13 @@
 /* ── Reader ──────────────────────────────────────────────────────────────────── */
 
 .reader-root {
-  height: 100vh;
+  min-height: 100vh;
+  height: 100dvh;
   background-color: rgb(var(--bg-canvas));
+}
+
+.reader-root--mobile {
+  padding-top: env(safe-area-inset-top);
 }
 
 /* PDF toolbar — three-column so center stays truly centered */
@@ -495,7 +500,8 @@
 
 /* Status screens (loading / error / no-pdf) */
 .reader-status-screen {
-  height: 100vh;
+  min-height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -602,6 +608,112 @@
 .reader-status-card__link:hover {
   background-color: rgb(var(--brand-ring));
   color: rgb(var(--brand-800));
+}
+
+@media (max-width: 768px) {
+  .rpv-default-layout__toolbar {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .reader-pdf-toolbar {
+    padding: 6px 8px;
+  }
+
+  .reader-pdf-toolbar--mobile {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .reader-pdf-toolbar--mobile::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reader-pdf-toolbar--mobile .reader-pdf-toolbar__sep {
+    height: 16px;
+    margin: 0 4px;
+  }
+
+  .reader-pdf-toolbar--mobile .rpv-toolbar__item {
+    flex: 0 0 auto;
+  }
+
+  .reader-pdf-toolbar--mobile .reader-pdf-toolbar__back {
+    margin-right: 4px;
+    padding: 4px 6px;
+  }
+
+  .reader-pdf-toolbar__back {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .reader-pdf-toolbar__title {
+    max-width: calc(100vw - 130px);
+    font-size: 13px;
+  }
+
+  .reader-pdf-toolbar__sep {
+    display: none;
+  }
+
+  .reader-pdf-toolbar--mobile .reader-pdf-toolbar__sep {
+    display: block;
+  }
+
+  .reader-root--mobile .rpv-default-layout__sidebar {
+    display: none !important;
+  }
+
+  .reader-root--mobile .rpv-default-layout__body {
+    border-left: none !important;
+  }
+
+  .rpv-core__button,
+  .rpv-core__minimal-button {
+    height: 28px !important;
+    min-width: 28px !important;
+  }
+
+  .rpv-core__textbox {
+    height: 26px !important;
+    width: 40px !important;
+  }
+
+  .reader-status-card {
+    width: calc(100vw - 2rem);
+    max-width: 420px;
+    padding: 24px 18px;
+    border-radius: 12px;
+  }
+
+  .reader-status-card__subtitle {
+    max-width: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .reader-pdf-toolbar__title {
+    display: none;
+  }
+
+  .reader-pdf-toolbar--mobile .reader-pdf-toolbar__back {
+    margin-right: 2px;
+  }
+
+  .reader-pdf-toolbar__back {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+
+  .reader-pdf-toolbar__page-sep {
+    display: none;
+  }
 }
 
 /* ── react-pdf-viewer dark mode overrides ────────────────────────────────────── */
