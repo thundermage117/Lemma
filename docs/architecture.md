@@ -70,3 +70,4 @@ See [decisions/](decisions/) for ADRs:
 - [006 - Supabase Auth and user-scoped data access](decisions/006-supabase-auth-and-user-scoped-data.md)
 - [007 - User ownership migration strategy](decisions/007-user-ownership-migration-strategy.md)
 - [008 - External object storage for book PDF hosting](decisions/008-cloudflare-r2-book-pdf-hosting.md)
+- [009 - Optimistic UI mutations with React Query](decisions/009-optimistic-ui-mutations.md)
