@@ -6,7 +6,18 @@ import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout'
 import '@react-pdf-viewer/core/lib/styles/index.css'
 import '@react-pdf-viewer/default-layout/lib/styles/index.css'
 import * as booksApi from '../api/books'
-import type { Book } from '../types'
+import * as aiApi from '../api/ai'
+import type { TopicEnrichment, ProblemEnrichment, QuestionEnrichment } from '../api/ai'
+import type { Book, Topic, Problem, Question, CreateTopicInput, CreateProblemInput, CreateQuestionInput } from '../types'
+import { Modal } from '../components/ui/Modal'
+import { TopicForm } from '../components/forms/TopicForm'
+import { ProblemForm } from '../components/forms/ProblemForm'
+import { QuestionForm } from '../components/forms/QuestionForm'
+import { SelectionPopover } from '../components/reader/SelectionPopover'
+import { useBooks } from '../hooks/useBooks'
+import { useTopics } from '../hooks/useTopics'
+import { useProblems } from '../hooks/useProblems'
+import { useQuestions } from '../hooks/useQuestions'
 
 const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString()
 const pdfBaseUrl = import.meta.env.VITE_PDF_BASE_URL?.trim() ?? ''
@@ -205,9 +216,25 @@ export function Reader() {
   const isDark = useIsDark()
   const isMobile = useIsMobile()
 
+  // AI capture state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedText, setSelectedText] = useState('')
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null)
+  const [enrichLoading, setEnrichLoading] = useState(false)
+  type ModalType = 'topic' | 'problem' | 'question' | null
+  const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const [topicInitial, setTopicInitial] = useState<Partial<Topic> | undefined>()
+  const [problemInitial, setProblemInitial] = useState<Partial<Problem> | undefined>()
+  const [questionInitial, setQuestionInitial] = useState<Partial<Question> | undefined>()
+
+  const { books } = useBooks()
+  const { topics, createTopic } = useTopics()
+  const { createProblem } = useProblems()
+  const { createQuestion } = useQuestions()
+
   useEffect(() => {
     booksApi.getById(Number(bookId))
-      .then((b) => { setBook(b); setLoading(false) })
+      .then((b) => { setBook(b); setLoading(false); setCurrentPage(b.currentPage || 1) })
       .catch((e) => { setError((e as Error).message); setLoading(false) })
   }, [bookId])
 
@@ -215,12 +242,83 @@ export function Reader() {
     if (debounceRef.current) clearTimeout(debounceRef.current)
   }, [])
 
+  // Dismiss popover on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const popover = document.getElementById('selection-popover')
+      if (popover && !popover.contains(e.target as Node)) {
+        setPopoverPos(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handlePageChange = (e: { currentPage: number }) => {
     const page = e.currentPage + 1
+    setCurrentPage(page)
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       booksApi.update(Number(bookId), { currentPage: page }).catch(() => {})
     }, 1000)
+  }
+
+  const handleMouseUp = () => {
+    setTimeout(() => {
+      const selection = window.getSelection()
+      const text = selection?.toString().trim() ?? ''
+      if (text.length < 5) {
+        setPopoverPos(null)
+        setSelectedText('')
+        return
+      }
+      const range = selection!.getRangeAt(0)
+      const rect = range.getBoundingClientRect()
+      setSelectedText(text)
+      setPopoverPos({ top: rect.top, left: rect.left + rect.width / 2 })
+    }, 10)
+  }
+
+  const handleCapture = async (type: 'topic' | 'problem' | 'question') => {
+    if (!selectedText || !book) return
+    setEnrichLoading(true)
+    try {
+      const result = await aiApi.enrich({ type, selectedText, bookTitle: book.title, pageNumber: currentPage })
+      if (type === 'topic') {
+        const e = result as TopicEnrichment
+        setTopicInitial({ title: e.title, subject: e.subject, summary: e.summary, notes: e.notes, examples: e.examples, linkedBookId: book.id, pageStart: currentPage, pageEnd: currentPage })
+      } else if (type === 'problem') {
+        const e = result as ProblemEnrichment
+        setProblemInitial({ title: e.title, problemStatement: e.problemStatement, difficulty: e.difficulty, tags: e.tags, linkedBookId: book.id, pageNumber: currentPage, sourceType: 'textbook' })
+      } else {
+        const e = result as QuestionEnrichment
+        setQuestionInitial({ text: e.text, linkedBookId: book.id, pageNumber: currentPage })
+      }
+      setActiveModal(type)
+      setPopoverPos(null)
+    } catch {
+      console.error('AI enrichment failed')
+    } finally {
+      setEnrichLoading(false)
+    }
+  }
+
+  const handleTopicCreate = async (data: CreateTopicInput) => {
+    await createTopic(data)
+    setActiveModal(null)
+    setTopicInitial(undefined)
+  }
+
+  const handleProblemCreate = async (data: CreateProblemInput) => {
+    await createProblem(data)
+    setActiveModal(null)
+    setProblemInitial(undefined)
+  }
+
+  const handleQuestionCreate = async (data: CreateQuestionInput) => {
+    await createQuestion(data)
+    setActiveModal(null)
+    setQuestionInitial(undefined)
   }
 
   const renderFitOptions = (onZoom: (newScale: number | SpecialZoomLevel) => void) => (
@@ -564,7 +662,7 @@ export function Reader() {
         </header>
       )}
 
-      <div className="reader-viewer-shell">
+      <div className="reader-viewer-shell" onMouseUp={handleMouseUp}>
         <Worker workerUrl={workerUrl}>
           <Viewer
             fileUrl={fileUrl}
@@ -576,6 +674,37 @@ export function Reader() {
           />
         </Worker>
       </div>
+
+      <SelectionPopover position={popoverPos} loading={enrichLoading} onCapture={handleCapture} />
+
+      <Modal isOpen={activeModal === 'topic'} onClose={() => setActiveModal(null)} title="New Topic Note" size="lg">
+        <TopicForm
+          initialValues={topicInitial}
+          books={books}
+          onSubmit={handleTopicCreate}
+          onCancel={() => setActiveModal(null)}
+        />
+      </Modal>
+
+      <Modal isOpen={activeModal === 'problem'} onClose={() => setActiveModal(null)} title="New Problem" size="lg">
+        <ProblemForm
+          initialValues={problemInitial}
+          books={books}
+          topics={topics}
+          onSubmit={handleProblemCreate}
+          onCancel={() => setActiveModal(null)}
+        />
+      </Modal>
+
+      <Modal isOpen={activeModal === 'question'} onClose={() => setActiveModal(null)} title="New Question" size="lg">
+        <QuestionForm
+          initialValues={questionInitial}
+          books={books}
+          topics={topics}
+          onSubmit={handleQuestionCreate}
+          onCancel={() => setActiveModal(null)}
+        />
+      </Modal>
     </div>
   )
 }

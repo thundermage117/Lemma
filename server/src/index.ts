@@ -9,6 +9,7 @@ import problemsRouter from './routes/problems'
 import journalRouter from './routes/journal'
 import questionsRouter from './routes/questions'
 import dashboardRouter from './routes/dashboard'
+import aiRouter from './routes/ai'
 import { rejectReadOnlyWrites, requireAuth } from './middleware/auth'
 import { apiNotFoundHandler, errorHandler } from './middleware/errorHandler'
 import {
@@ -41,6 +42,7 @@ app.use('/api/problems', problemsRouter)
 app.use('/api/journal', journalRouter)
 app.use('/api/questions', questionsRouter)
 app.use('/api/dashboard', dashboardRouter)
+app.use('/api/ai', aiRouter)
 app.use('/api', apiNotFoundHandler)
 
 if (fs.existsSync(clientDistPath)) {
